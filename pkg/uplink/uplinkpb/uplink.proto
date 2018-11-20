@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-// import "google/rpc/status.proto";
+import "google/rpc/status.proto";
 
 option go_package = "uplinkpb";
 
@@ -55,8 +55,7 @@ message SetupRequest {
     // response, because it's already a response).
     //
     // TODO(mkm): find a way to make go mod work with protobuf source imports.
-    //google.rpc.Status error = 3;
-    string error_message = 3;
+    google.rpc.Status error = 3;
   }
 }
 
