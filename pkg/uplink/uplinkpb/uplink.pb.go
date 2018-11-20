@@ -4,8 +4,10 @@
 package uplinkpb
 
 import (
+	context "context"
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
+	grpc "google.golang.org/grpc"
 	math "math"
 )
 
@@ -20,12 +22,827 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
+type RegisterTrigger struct {
+	Nonce                []byte   `protobuf:"bytes,1,opt,name=nonce,proto3" json:"nonce,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *RegisterTrigger) Reset()         { *m = RegisterTrigger{} }
+func (m *RegisterTrigger) String() string { return proto.CompactTextString(m) }
+func (*RegisterTrigger) ProtoMessage()    {}
+func (*RegisterTrigger) Descriptor() ([]byte, []int) {
+	return fileDescriptor_4b16aec953f09314, []int{0}
+}
+
+func (m *RegisterTrigger) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_RegisterTrigger.Unmarshal(m, b)
+}
+func (m *RegisterTrigger) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_RegisterTrigger.Marshal(b, m, deterministic)
+}
+func (m *RegisterTrigger) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RegisterTrigger.Merge(m, src)
+}
+func (m *RegisterTrigger) XXX_Size() int {
+	return xxx_messageInfo_RegisterTrigger.Size(m)
+}
+func (m *RegisterTrigger) XXX_DiscardUnknown() {
+	xxx_messageInfo_RegisterTrigger.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_RegisterTrigger proto.InternalMessageInfo
+
+func (m *RegisterTrigger) GetNonce() []byte {
+	if m != nil {
+		return m.Nonce
+	}
+	return nil
+}
+
+type RegisterRequest struct {
+	// The public key used to sign the nonce.
+	//
+	// existing encoding standards like pkcs#12 and pem are slow to gain support for
+	// new ciphers; for now we'll just encode the type of the public key in the proto
+	// schema and deal with cipher evolution by evolving the proto.
+	Ed25519PublicKey []byte `protobuf:"bytes,1,opt,name=ed25519_public_key,json=ed25519PublicKey,proto3" json:"ed25519_public_key,omitempty"`
+	// The signature of the nonce.
+	Signature []byte `protobuf:"bytes,2,opt,name=signature,proto3" json:"signature,omitempty"`
+	// request that the tunnel broker has at least one of these ports open.
+	// if the broker doesn't have (or allow) some of these ports, they won't be
+	// present in the "ingress" repeated field of the subsequent Setup message.
+	// The client might treat the lack of a requested port as a fatal error.
+	Ports                []int32  `protobuf:"varint,3,rep,packed,name=ports,proto3" json:"ports,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *RegisterRequest) Reset()         { *m = RegisterRequest{} }
+func (m *RegisterRequest) String() string { return proto.CompactTextString(m) }
+func (*RegisterRequest) ProtoMessage()    {}
+func (*RegisterRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_4b16aec953f09314, []int{1}
+}
+
+func (m *RegisterRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_RegisterRequest.Unmarshal(m, b)
+}
+func (m *RegisterRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_RegisterRequest.Marshal(b, m, deterministic)
+}
+func (m *RegisterRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RegisterRequest.Merge(m, src)
+}
+func (m *RegisterRequest) XXX_Size() int {
+	return xxx_messageInfo_RegisterRequest.Size(m)
+}
+func (m *RegisterRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_RegisterRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_RegisterRequest proto.InternalMessageInfo
+
+func (m *RegisterRequest) GetEd25519PublicKey() []byte {
+	if m != nil {
+		return m.Ed25519PublicKey
+	}
+	return nil
+}
+
+func (m *RegisterRequest) GetSignature() []byte {
+	if m != nil {
+		return m.Signature
+	}
+	return nil
+}
+
+func (m *RegisterRequest) GetPorts() []int32 {
+	if m != nil {
+		return m.Ports
+	}
+	return nil
+}
+
+type SetupRequest struct {
+	// Types that are valid to be assigned to Setup:
+	//	*SetupRequest_Ingress_
+	//	*SetupRequest_Redirect_
+	//	*SetupRequest_ErrorMessage
+	Setup                isSetupRequest_Setup `protobuf_oneof:"setup"`
+	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
+	XXX_unrecognized     []byte               `json:"-"`
+	XXX_sizecache        int32                `json:"-"`
+}
+
+func (m *SetupRequest) Reset()         { *m = SetupRequest{} }
+func (m *SetupRequest) String() string { return proto.CompactTextString(m) }
+func (*SetupRequest) ProtoMessage()    {}
+func (*SetupRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_4b16aec953f09314, []int{2}
+}
+
+func (m *SetupRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SetupRequest.Unmarshal(m, b)
+}
+func (m *SetupRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SetupRequest.Marshal(b, m, deterministic)
+}
+func (m *SetupRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SetupRequest.Merge(m, src)
+}
+func (m *SetupRequest) XXX_Size() int {
+	return xxx_messageInfo_SetupRequest.Size(m)
+}
+func (m *SetupRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_SetupRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SetupRequest proto.InternalMessageInfo
+
+type isSetupRequest_Setup interface {
+	isSetupRequest_Setup()
+}
+
+type SetupRequest_Ingress_ struct {
+	Ingress *SetupRequest_Ingress `protobuf:"bytes,1,opt,name=ingress,proto3,oneof"`
+}
+
+type SetupRequest_Redirect_ struct {
+	Redirect *SetupRequest_Redirect `protobuf:"bytes,2,opt,name=redirect,proto3,oneof"`
+}
+
+type SetupRequest_ErrorMessage struct {
+	ErrorMessage string `protobuf:"bytes,3,opt,name=error_message,json=errorMessage,proto3,oneof"`
+}
+
+func (*SetupRequest_Ingress_) isSetupRequest_Setup() {}
+
+func (*SetupRequest_Redirect_) isSetupRequest_Setup() {}
+
+func (*SetupRequest_ErrorMessage) isSetupRequest_Setup() {}
+
+func (m *SetupRequest) GetSetup() isSetupRequest_Setup {
+	if m != nil {
+		return m.Setup
+	}
+	return nil
+}
+
+func (m *SetupRequest) GetIngress() *SetupRequest_Ingress {
+	if x, ok := m.GetSetup().(*SetupRequest_Ingress_); ok {
+		return x.Ingress
+	}
+	return nil
+}
+
+func (m *SetupRequest) GetRedirect() *SetupRequest_Redirect {
+	if x, ok := m.GetSetup().(*SetupRequest_Redirect_); ok {
+		return x.Redirect
+	}
+	return nil
+}
+
+func (m *SetupRequest) GetErrorMessage() string {
+	if x, ok := m.GetSetup().(*SetupRequest_ErrorMessage); ok {
+		return x.ErrorMessage
+	}
+	return ""
+}
+
+// XXX_OneofFuncs is for the internal use of the proto package.
+func (*SetupRequest) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
+	return _SetupRequest_OneofMarshaler, _SetupRequest_OneofUnmarshaler, _SetupRequest_OneofSizer, []interface{}{
+		(*SetupRequest_Ingress_)(nil),
+		(*SetupRequest_Redirect_)(nil),
+		(*SetupRequest_ErrorMessage)(nil),
+	}
+}
+
+func _SetupRequest_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
+	m := msg.(*SetupRequest)
+	// setup
+	switch x := m.Setup.(type) {
+	case *SetupRequest_Ingress_:
+		b.EncodeVarint(1<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.Ingress); err != nil {
+			return err
+		}
+	case *SetupRequest_Redirect_:
+		b.EncodeVarint(2<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.Redirect); err != nil {
+			return err
+		}
+	case *SetupRequest_ErrorMessage:
+		b.EncodeVarint(3<<3 | proto.WireBytes)
+		b.EncodeStringBytes(x.ErrorMessage)
+	case nil:
+	default:
+		return fmt.Errorf("SetupRequest.Setup has unexpected type %T", x)
+	}
+	return nil
+}
+
+func _SetupRequest_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
+	m := msg.(*SetupRequest)
+	switch tag {
+	case 1: // setup.ingress
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(SetupRequest_Ingress)
+		err := b.DecodeMessage(msg)
+		m.Setup = &SetupRequest_Ingress_{msg}
+		return true, err
+	case 2: // setup.redirect
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(SetupRequest_Redirect)
+		err := b.DecodeMessage(msg)
+		m.Setup = &SetupRequest_Redirect_{msg}
+		return true, err
+	case 3: // setup.error_message
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		x, err := b.DecodeStringBytes()
+		m.Setup = &SetupRequest_ErrorMessage{x}
+		return true, err
+	default:
+		return false, nil
+	}
+}
+
+func _SetupRequest_OneofSizer(msg proto.Message) (n int) {
+	m := msg.(*SetupRequest)
+	// setup
+	switch x := m.Setup.(type) {
+	case *SetupRequest_Ingress_:
+		s := proto.Size(x.Ingress)
+		n += 1 // tag and wire
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case *SetupRequest_Redirect_:
+		s := proto.Size(x.Redirect)
+		n += 1 // tag and wire
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case *SetupRequest_ErrorMessage:
+		n += 1 // tag and wire
+		n += proto.SizeVarint(uint64(len(x.ErrorMessage)))
+		n += len(x.ErrorMessage)
+	case nil:
+	default:
+		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
+	}
+	return n
+}
+
+type SetupRequest_Ingress struct {
+	// hostname:port pairs where the tunnel will be accessible to external clients.
+	Ingress              []string `protobuf:"bytes,1,rep,name=ingress,proto3" json:"ingress,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *SetupRequest_Ingress) Reset()         { *m = SetupRequest_Ingress{} }
+func (m *SetupRequest_Ingress) String() string { return proto.CompactTextString(m) }
+func (*SetupRequest_Ingress) ProtoMessage()    {}
+func (*SetupRequest_Ingress) Descriptor() ([]byte, []int) {
+	return fileDescriptor_4b16aec953f09314, []int{2, 0}
+}
+
+func (m *SetupRequest_Ingress) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SetupRequest_Ingress.Unmarshal(m, b)
+}
+func (m *SetupRequest_Ingress) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SetupRequest_Ingress.Marshal(b, m, deterministic)
+}
+func (m *SetupRequest_Ingress) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SetupRequest_Ingress.Merge(m, src)
+}
+func (m *SetupRequest_Ingress) XXX_Size() int {
+	return xxx_messageInfo_SetupRequest_Ingress.Size(m)
+}
+func (m *SetupRequest_Ingress) XXX_DiscardUnknown() {
+	xxx_messageInfo_SetupRequest_Ingress.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SetupRequest_Ingress proto.InternalMessageInfo
+
+func (m *SetupRequest_Ingress) GetIngress() []string {
+	if m != nil {
+		return m.Ingress
+	}
+	return nil
+}
+
+type SetupRequest_Redirect struct {
+	// the tunnel request is accepted by this broker instance is not the right
+	// endpoint the setup a durable tunnel session.
+	// The client should try again to setup the tunnel by contact to one or more of
+	// these host:port pairs.
+	RedirectTo           []string `protobuf:"bytes,2,rep,name=redirect_to,json=redirectTo,proto3" json:"redirect_to,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *SetupRequest_Redirect) Reset()         { *m = SetupRequest_Redirect{} }
+func (m *SetupRequest_Redirect) String() string { return proto.CompactTextString(m) }
+func (*SetupRequest_Redirect) ProtoMessage()    {}
+func (*SetupRequest_Redirect) Descriptor() ([]byte, []int) {
+	return fileDescriptor_4b16aec953f09314, []int{2, 1}
+}
+
+func (m *SetupRequest_Redirect) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SetupRequest_Redirect.Unmarshal(m, b)
+}
+func (m *SetupRequest_Redirect) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SetupRequest_Redirect.Marshal(b, m, deterministic)
+}
+func (m *SetupRequest_Redirect) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SetupRequest_Redirect.Merge(m, src)
+}
+func (m *SetupRequest_Redirect) XXX_Size() int {
+	return xxx_messageInfo_SetupRequest_Redirect.Size(m)
+}
+func (m *SetupRequest_Redirect) XXX_DiscardUnknown() {
+	xxx_messageInfo_SetupRequest_Redirect.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SetupRequest_Redirect proto.InternalMessageInfo
+
+func (m *SetupRequest_Redirect) GetRedirectTo() []string {
+	if m != nil {
+		return m.RedirectTo
+	}
+	return nil
+}
+
+type SetupResponse struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *SetupResponse) Reset()         { *m = SetupResponse{} }
+func (m *SetupResponse) String() string { return proto.CompactTextString(m) }
+func (*SetupResponse) ProtoMessage()    {}
+func (*SetupResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_4b16aec953f09314, []int{3}
+}
+
+func (m *SetupResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SetupResponse.Unmarshal(m, b)
+}
+func (m *SetupResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SetupResponse.Marshal(b, m, deterministic)
+}
+func (m *SetupResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SetupResponse.Merge(m, src)
+}
+func (m *SetupResponse) XXX_Size() int {
+	return xxx_messageInfo_SetupResponse.Size(m)
+}
+func (m *SetupResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_SetupResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SetupResponse proto.InternalMessageInfo
+
+type Request struct {
+	// This **must** be set on the first `Request` of each `Ingress()` action.
+	// If it is set on subsequent calls, it **must** match the value of the
+	// first request.
+	Header *Request_Header `protobuf:"bytes,2,opt,name=header,proto3" json:"header,omitempty"`
+	// If `true`, this indicates that the send is complete. Sending any
+	// `Request`s subsequent to one in which `finish` is `true` will
+	// cause an error. (i.e. this allows each stream direction to be closed separately
+	// which is also what can happen to the tunneled TCP stream anyway).
+	Finish bool `protobuf:"varint,3,opt,name=finish,proto3" json:"finish,omitempty"`
+	// A portion of the data for the resource. The client **may** leave `data`
+	// empty for any given `Request`. This enables the client to inform the
+	// service that the request is still live and more data might be coming.
+	Data                 []byte   `protobuf:"bytes,4,opt,name=data,proto3" json:"data,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Request) Reset()         { *m = Request{} }
+func (m *Request) String() string { return proto.CompactTextString(m) }
+func (*Request) ProtoMessage()    {}
+func (*Request) Descriptor() ([]byte, []int) {
+	return fileDescriptor_4b16aec953f09314, []int{4}
+}
+
+func (m *Request) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Request.Unmarshal(m, b)
+}
+func (m *Request) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Request.Marshal(b, m, deterministic)
+}
+func (m *Request) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Request.Merge(m, src)
+}
+func (m *Request) XXX_Size() int {
+	return xxx_messageInfo_Request.Size(m)
+}
+func (m *Request) XXX_DiscardUnknown() {
+	xxx_messageInfo_Request.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Request proto.InternalMessageInfo
+
+func (m *Request) GetHeader() *Request_Header {
+	if m != nil {
+		return m.Header
+	}
+	return nil
+}
+
+func (m *Request) GetFinish() bool {
+	if m != nil {
+		return m.Finish
+	}
+	return false
+}
+
+func (m *Request) GetData() []byte {
+	if m != nil {
+		return m.Data
+	}
+	return nil
+}
+
+// The tunnel broker conveys some information about the original session with the
+// client hitting the ingress. This can be useful for logging or for a
+// second level virtual hosting if the broker supports wildcard DNS.
+type Request_Header struct {
+	// <tunnel_id>.udig.io
+	//     ^^^
+	TunnelId             string   `protobuf:"bytes,1,opt,name=tunnel_id,json=tunnelId,proto3" json:"tunnel_id,omitempty"`
+	Protocol             string   `protobuf:"bytes,2,opt,name=protocol,proto3" json:"protocol,omitempty"`
+	Saddr                string   `protobuf:"bytes,3,opt,name=saddr,proto3" json:"saddr,omitempty"`
+	Daddr                string   `protobuf:"bytes,4,opt,name=daddr,proto3" json:"daddr,omitempty"`
+	Sport                int32    `protobuf:"varint,5,opt,name=sport,proto3" json:"sport,omitempty"`
+	Dport                int32    `protobuf:"varint,6,opt,name=dport,proto3" json:"dport,omitempty"`
+	Sni                  string   `protobuf:"bytes,7,opt,name=sni,proto3" json:"sni,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Request_Header) Reset()         { *m = Request_Header{} }
+func (m *Request_Header) String() string { return proto.CompactTextString(m) }
+func (*Request_Header) ProtoMessage()    {}
+func (*Request_Header) Descriptor() ([]byte, []int) {
+	return fileDescriptor_4b16aec953f09314, []int{4, 0}
+}
+
+func (m *Request_Header) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Request_Header.Unmarshal(m, b)
+}
+func (m *Request_Header) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Request_Header.Marshal(b, m, deterministic)
+}
+func (m *Request_Header) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Request_Header.Merge(m, src)
+}
+func (m *Request_Header) XXX_Size() int {
+	return xxx_messageInfo_Request_Header.Size(m)
+}
+func (m *Request_Header) XXX_DiscardUnknown() {
+	xxx_messageInfo_Request_Header.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Request_Header proto.InternalMessageInfo
+
+func (m *Request_Header) GetTunnelId() string {
+	if m != nil {
+		return m.TunnelId
+	}
+	return ""
+}
+
+func (m *Request_Header) GetProtocol() string {
+	if m != nil {
+		return m.Protocol
+	}
+	return ""
+}
+
+func (m *Request_Header) GetSaddr() string {
+	if m != nil {
+		return m.Saddr
+	}
+	return ""
+}
+
+func (m *Request_Header) GetDaddr() string {
+	if m != nil {
+		return m.Daddr
+	}
+	return ""
+}
+
+func (m *Request_Header) GetSport() int32 {
+	if m != nil {
+		return m.Sport
+	}
+	return 0
+}
+
+func (m *Request_Header) GetDport() int32 {
+	if m != nil {
+		return m.Dport
+	}
+	return 0
+}
+
+func (m *Request_Header) GetSni() string {
+	if m != nil {
+		return m.Sni
+	}
+	return ""
+}
+
+type Response struct {
+	// A portion of the data for the resource. The service **may** leave `data`
+	// empty for any given `Response`. This enables the service to inform the
+	// client that the request is still live and more data might be coming.
+	Data []byte `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+	// If `true`, this indicates that the send is complete. Sending any
+	// `Request`s subsequent to one in which `finish` is `true` will
+	// cause an error.
+	Finish               bool     `protobuf:"varint,2,opt,name=finish,proto3" json:"finish,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Response) Reset()         { *m = Response{} }
+func (m *Response) String() string { return proto.CompactTextString(m) }
+func (*Response) ProtoMessage()    {}
+func (*Response) Descriptor() ([]byte, []int) {
+	return fileDescriptor_4b16aec953f09314, []int{5}
+}
+
+func (m *Response) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Response.Unmarshal(m, b)
+}
+func (m *Response) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Response.Marshal(b, m, deterministic)
+}
+func (m *Response) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Response.Merge(m, src)
+}
+func (m *Response) XXX_Size() int {
+	return xxx_messageInfo_Response.Size(m)
+}
+func (m *Response) XXX_DiscardUnknown() {
+	xxx_messageInfo_Response.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Response proto.InternalMessageInfo
+
+func (m *Response) GetData() []byte {
+	if m != nil {
+		return m.Data
+	}
+	return nil
+}
+
+func (m *Response) GetFinish() bool {
+	if m != nil {
+		return m.Finish
+	}
+	return false
+}
+
+func init() {
+	proto.RegisterType((*RegisterTrigger)(nil), "RegisterTrigger")
+	proto.RegisterType((*RegisterRequest)(nil), "RegisterRequest")
+	proto.RegisterType((*SetupRequest)(nil), "SetupRequest")
+	proto.RegisterType((*SetupRequest_Ingress)(nil), "SetupRequest.Ingress")
+	proto.RegisterType((*SetupRequest_Redirect)(nil), "SetupRequest.Redirect")
+	proto.RegisterType((*SetupResponse)(nil), "SetupResponse")
+	proto.RegisterType((*Request)(nil), "Request")
+	proto.RegisterType((*Request_Header)(nil), "Request.Header")
+	proto.RegisterType((*Response)(nil), "Response")
+}
+
 func init() { proto.RegisterFile("pkg/uplink/uplinkpb/uplink.proto", fileDescriptor_4b16aec953f09314) }
 
 var fileDescriptor_4b16aec953f09314 = []byte{
-	// 58 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x52, 0x28, 0xc8, 0x4e, 0xd7,
-	0x2f, 0x2d, 0xc8, 0xc9, 0xcc, 0xcb, 0x86, 0x52, 0x05, 0x49, 0x50, 0x86, 0x5e, 0x41, 0x51, 0x7e,
-	0x49, 0xbe, 0x13, 0x57, 0x14, 0x07, 0x4c, 0x22, 0x89, 0x0d, 0x2c, 0x64, 0x0c, 0x08, 0x00, 0x00,
-	0xff, 0xff, 0x55, 0x59, 0x61, 0xf8, 0x36, 0x00, 0x00, 0x00,
+	// 514 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x5c, 0x53, 0x4d, 0x8f, 0xd3, 0x30,
+	0x10, 0xdd, 0xf4, 0x23, 0x4d, 0xa6, 0x2d, 0xad, 0x2c, 0x58, 0x45, 0x01, 0x89, 0x2a, 0x08, 0xb6,
+	0x12, 0x28, 0xb0, 0x85, 0x45, 0xe2, 0xba, 0xa7, 0xae, 0x10, 0x12, 0x32, 0xcb, 0x85, 0x4b, 0x95,
+	0x36, 0x43, 0xd6, 0x6a, 0x49, 0x82, 0xed, 0x1c, 0xf6, 0xce, 0x91, 0x7f, 0xc2, 0x2f, 0xe4, 0x86,
+	0x32, 0xb6, 0xfb, 0xc1, 0x29, 0x9e, 0x37, 0xe3, 0xbc, 0x99, 0xf7, 0xc6, 0x30, 0xab, 0xb7, 0xc5,
+	0xeb, 0xa6, 0xde, 0x89, 0x72, 0x6b, 0x3f, 0xf5, 0xda, 0x1e, 0xd2, 0x5a, 0x56, 0xba, 0x4a, 0x2e,
+	0x60, 0xc2, 0xb1, 0x10, 0x4a, 0xa3, 0xbc, 0x95, 0xa2, 0x28, 0x50, 0xb2, 0x87, 0xd0, 0x2f, 0xab,
+	0x72, 0x83, 0x91, 0x37, 0xf3, 0xe6, 0x23, 0x6e, 0x82, 0x44, 0x1d, 0x0a, 0x39, 0xfe, 0x6c, 0x50,
+	0x69, 0xf6, 0x0a, 0x18, 0xe6, 0x8b, 0xab, 0xab, 0xcb, 0x0f, 0xab, 0xba, 0x59, 0xef, 0xc4, 0x66,
+	0xb5, 0xc5, 0x7b, 0x7b, 0x6b, 0x6a, 0x33, 0x9f, 0x29, 0xf1, 0x11, 0xef, 0xd9, 0x13, 0x08, 0x95,
+	0x28, 0xca, 0x4c, 0x37, 0x12, 0xa3, 0x0e, 0x15, 0x1d, 0x80, 0x96, 0xb4, 0xae, 0xa4, 0x56, 0x51,
+	0x77, 0xd6, 0x9d, 0xf7, 0xb9, 0x09, 0x92, 0xbf, 0x1e, 0x8c, 0xbe, 0xa0, 0x6e, 0x6a, 0x47, 0x79,
+	0x09, 0x03, 0x51, 0x16, 0x12, 0x95, 0x22, 0x9e, 0xe1, 0xe2, 0x51, 0x7a, 0x9c, 0x4f, 0x6f, 0x4c,
+	0x72, 0x79, 0xc6, 0x5d, 0x1d, 0x7b, 0x07, 0x81, 0xc4, 0x5c, 0x48, 0xdc, 0x68, 0xa2, 0x1d, 0x2e,
+	0xce, 0x4f, 0xef, 0x70, 0x9b, 0x5d, 0x9e, 0xf1, 0x7d, 0x25, 0x7b, 0x0e, 0x63, 0x94, 0xb2, 0x92,
+	0xab, 0x1f, 0xa8, 0x54, 0x56, 0x60, 0xd4, 0x9d, 0x79, 0xf3, 0x70, 0x79, 0xc6, 0x47, 0x04, 0x7f,
+	0x32, 0x68, 0xfc, 0x0c, 0x06, 0x96, 0x92, 0x45, 0xc7, 0xad, 0x75, 0xe7, 0xe1, 0xbe, 0x83, 0xf8,
+	0x25, 0x04, 0x8e, 0x83, 0x3d, 0x85, 0xa1, 0xe3, 0x58, 0xe9, 0x2a, 0xea, 0x50, 0x25, 0x38, 0xe8,
+	0xb6, 0xba, 0x1e, 0x40, 0x5f, 0xb5, 0xdd, 0x25, 0x13, 0x18, 0xdb, 0x36, 0x55, 0x5d, 0x95, 0x0a,
+	0x93, 0xdf, 0x1d, 0x18, 0x38, 0x1d, 0x2e, 0xc0, 0xbf, 0xc3, 0x2c, 0x47, 0x69, 0x47, 0x9a, 0xa4,
+	0x6e, 0x9a, 0x25, 0xc1, 0xdc, 0xa6, 0xd9, 0x39, 0xf8, 0xdf, 0x45, 0x29, 0xd4, 0x1d, 0x0d, 0x10,
+	0x70, 0x1b, 0x31, 0x06, 0xbd, 0x3c, 0xd3, 0x59, 0xd4, 0x23, 0x23, 0xe8, 0x1c, 0xff, 0xf1, 0xc0,
+	0x37, 0xd7, 0xd9, 0x63, 0x08, 0x75, 0x53, 0x96, 0xb8, 0x5b, 0x89, 0x9c, 0x94, 0x0e, 0x79, 0x60,
+	0x80, 0x9b, 0x9c, 0xc5, 0x10, 0xd0, 0xf2, 0x6c, 0xaa, 0x1d, 0xd1, 0x87, 0x7c, 0x1f, 0xb7, 0x3e,
+	0xaa, 0x2c, 0xcf, 0xa5, 0xd1, 0x8b, 0x9b, 0xa0, 0x45, 0x73, 0x42, 0x7b, 0x06, 0xcd, 0x1d, 0xaa,
+	0x5a, 0x9f, 0xa3, 0xfe, 0xcc, 0x6b, 0x3d, 0xa7, 0x80, 0x6a, 0x09, 0xf5, 0x0d, 0x4a, 0x01, 0x9b,
+	0x42, 0x57, 0x95, 0x22, 0x1a, 0xd0, 0xfd, 0xf6, 0x98, 0xbc, 0x6f, 0x55, 0x35, 0xd2, 0xec, 0xa7,
+	0xf1, 0x0e, 0xd3, 0x1c, 0x4d, 0xde, 0x39, 0x9e, 0x7c, 0xf1, 0xcb, 0x03, 0xff, 0x2b, 0x3d, 0x01,
+	0x96, 0xb6, 0xbf, 0x30, 0x3b, 0xcd, 0xa6, 0xe9, 0x7f, 0xef, 0x20, 0x3e, 0x20, 0x4e, 0xf5, 0x17,
+	0xd0, 0x27, 0x4b, 0xd8, 0xf8, 0x64, 0x83, 0xe2, 0x07, 0xe9, 0x89, 0x53, 0x2c, 0x39, 0x6c, 0x45,
+	0xe0, 0x8c, 0x89, 0xc3, 0xd4, 0xe5, 0xe7, 0xde, 0x1b, 0xef, 0x1a, 0xbe, 0x05, 0xee, 0x45, 0xae,
+	0x7d, 0x92, 0xef, 0xed, 0xbf, 0x00, 0x00, 0x00, 0xff, 0xff, 0x90, 0x8c, 0xb5, 0x99, 0xaf, 0x03,
+	0x00, 0x00,
+}
+
+// Reference imports to suppress errors if they are not otherwise used.
+var _ context.Context
+var _ grpc.ClientConn
+
+// This is a compile-time assertion to ensure that this generated file
+// is compatible with the grpc package it is being compiled against.
+const _ = grpc.SupportPackageIsVersion4
+
+// UplinkClient is the client API for Uplink service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+type UplinkClient interface {
+	Register(ctx context.Context, in *RegisterTrigger, opts ...grpc.CallOption) (*RegisterRequest, error)
+	Setup(ctx context.Context, in *SetupRequest, opts ...grpc.CallOption) (*SetupResponse, error)
+	Ingress(ctx context.Context, opts ...grpc.CallOption) (Uplink_IngressClient, error)
+}
+
+type uplinkClient struct {
+	cc *grpc.ClientConn
+}
+
+func NewUplinkClient(cc *grpc.ClientConn) UplinkClient {
+	return &uplinkClient{cc}
+}
+
+func (c *uplinkClient) Register(ctx context.Context, in *RegisterTrigger, opts ...grpc.CallOption) (*RegisterRequest, error) {
+	out := new(RegisterRequest)
+	err := c.cc.Invoke(ctx, "/Uplink/Register", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *uplinkClient) Setup(ctx context.Context, in *SetupRequest, opts ...grpc.CallOption) (*SetupResponse, error) {
+	out := new(SetupResponse)
+	err := c.cc.Invoke(ctx, "/Uplink/Setup", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *uplinkClient) Ingress(ctx context.Context, opts ...grpc.CallOption) (Uplink_IngressClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_Uplink_serviceDesc.Streams[0], "/Uplink/Ingress", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &uplinkIngressClient{stream}
+	return x, nil
+}
+
+type Uplink_IngressClient interface {
+	Send(*Request) error
+	Recv() (*Response, error)
+	grpc.ClientStream
+}
+
+type uplinkIngressClient struct {
+	grpc.ClientStream
+}
+
+func (x *uplinkIngressClient) Send(m *Request) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *uplinkIngressClient) Recv() (*Response, error) {
+	m := new(Response)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+// UplinkServer is the server API for Uplink service.
+type UplinkServer interface {
+	Register(context.Context, *RegisterTrigger) (*RegisterRequest, error)
+	Setup(context.Context, *SetupRequest) (*SetupResponse, error)
+	Ingress(Uplink_IngressServer) error
+}
+
+func RegisterUplinkServer(s *grpc.Server, srv UplinkServer) {
+	s.RegisterService(&_Uplink_serviceDesc, srv)
+}
+
+func _Uplink_Register_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterTrigger)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UplinkServer).Register(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Uplink/Register",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UplinkServer).Register(ctx, req.(*RegisterTrigger))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Uplink_Setup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetupRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UplinkServer).Setup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Uplink/Setup",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UplinkServer).Setup(ctx, req.(*SetupRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Uplink_Ingress_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(UplinkServer).Ingress(&uplinkIngressServer{stream})
+}
+
+type Uplink_IngressServer interface {
+	Send(*Response) error
+	Recv() (*Request, error)
+	grpc.ServerStream
+}
+
+type uplinkIngressServer struct {
+	grpc.ServerStream
+}
+
+func (x *uplinkIngressServer) Send(m *Response) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *uplinkIngressServer) Recv() (*Request, error) {
+	m := new(Request)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+var _Uplink_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "Uplink",
+	HandlerType: (*UplinkServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Register",
+			Handler:    _Uplink_Register_Handler,
+		},
+		{
+			MethodName: "Setup",
+			Handler:    _Uplink_Setup_Handler,
+		},
+	},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "Ingress",
+			Handler:       _Uplink_Ingress_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
+	},
+	Metadata: "pkg/uplink/uplinkpb/uplink.proto",
 }

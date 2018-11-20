@@ -1,3 +1,108 @@
 syntax = "proto3";
 
+// import "google/rpc/status.proto";
+
 option go_package = "uplinkpb";
+
+service Uplink {
+  rpc Register(RegisterTrigger) returns (RegisterRequest);
+  rpc Setup(SetupRequest) returns (SetupResponse);
+  rpc Ingress(stream Request) returns (stream Response);
+}
+
+message RegisterTrigger {
+  bytes nonce = 1;
+}
+
+message RegisterRequest {
+  // The public key used to sign the nonce.
+  //
+  // existing encoding standards like pkcs#12 and pem are slow to gain support for
+  // new ciphers; for now we'll just encode the type of the public key in the proto
+  // schema and deal with cipher evolution by evolving the proto.
+  bytes ed25519_public_key = 1;
+
+  // The signature of the nonce.
+  bytes signature = 2;
+
+  // request that the tunnel broker has at least one of these ports open.
+  // if the broker doesn't have (or allow) some of these ports, they won't be
+  // present in the "ingress" repeated field of the subsequent Setup message.
+  // The client might treat the lack of a requested port as a fatal error.
+  repeated int32 ports = 3;
+}
+
+message SetupRequest {
+  message Ingress {
+    // hostname:port pairs where the tunnel will be accessible to external clients.
+    repeated string ingress = 1;
+  }
+  
+  message Redirect {
+    // the tunnel request is accepted by this broker instance is not the right
+    // endpoint the setup a durable tunnel session.
+    // The client should try again to setup the tunnel by contact to one or more of
+    // these host:port pairs.
+    repeated string redirect_to = 2;
+  }
+
+  oneof setup {
+     Ingress ingress = 1;
+     Redirect redirect = 2;
+ 
+    // in case of any error setting up the tunnel, the server will send the
+    // status here (because it cannot respond with an error to the RegisterResponse
+    // response, because it's already a response).
+    //
+    // TODO(mkm): find a way to make go mod work with protobuf source imports.
+    //google.rpc.Status error = 3;
+    string error_message = 3;
+  }
+}
+
+message SetupResponse {}
+
+message Request {
+  // The tunnel broker conveys some information about the original session with the
+  // client hitting the ingress. This can be useful for logging or for a
+  // second level virtual hosting if the broker supports wildcard DNS.
+  message Header {
+    // <tunnel_id>.udig.io 
+    //     ^^^
+    string tunnel_id = 1;
+    string protocol = 2; // *must* be "TCP" for now.
+    string saddr = 3;
+    string daddr = 4;
+    int32 sport = 5;
+    int32 dport = 6;
+    string sni = 7; // e.g. foo.bar.<tunnel_id>.udig.io
+  }
+
+  // This **must** be set on the first `Request` of each `Ingress()` action.
+  // If it is set on subsequent calls, it **must** match the value of the
+  // first request.
+  Header header = 2;
+
+  // If `true`, this indicates that the send is complete. Sending any
+  // `Request`s subsequent to one in which `finish` is `true` will
+  // cause an error. (i.e. this allows each stream direction to be closed separately
+  // which is also what can happen to the tunneled TCP stream anyway).
+  bool finish = 3;
+
+  // A portion of the data for the resource. The client **may** leave `data`
+  // empty for any given `Request`. This enables the client to inform the
+  // service that the request is still live and more data might be coming.
+  bytes data = 4;
+}
+
+message Response {
+  // A portion of the data for the resource. The service **may** leave `data`
+  // empty for any given `Response`. This enables the service to inform the
+  // client that the request is still live and more data might be coming.
+  bytes data = 1;
+
+  // If `true`, this indicates that the send is complete. Sending any
+  // `Request`s subsequent to one in which `finish` is `true` will
+  // cause an error.
+  bool finish = 2;
+}
