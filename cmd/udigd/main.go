@@ -11,6 +11,8 @@ import (
 	"github.com/bitnami-labs/promhttpmux"
 	"github.com/cockroachdb/cmux"
 	"github.com/golang/glog"
+	"github.com/grpc-ecosystem/go-grpc-middleware"
+	"github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	"github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/juju/errors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -23,6 +25,30 @@ import (
 var (
 	laddr = flag.String("listen", ":4000", "http/grpc listening address:port")
 )
+
+func interceptors() []grpc.ServerOption {
+	interceptors := []struct {
+		stream grpc.StreamServerInterceptor
+		unary  grpc.UnaryServerInterceptor
+	}{
+		{grpc_prometheus.StreamServerInterceptor, grpc_prometheus.UnaryServerInterceptor},
+
+		{grpc_recovery.StreamServerInterceptor(), grpc_recovery.UnaryServerInterceptor()},
+	}
+	var (
+		streamInterceptors []grpc.StreamServerInterceptor
+		unaryInterceptors  []grpc.UnaryServerInterceptor
+	)
+	for _, i := range interceptors {
+		streamInterceptors = append(streamInterceptors, i.stream)
+		unaryInterceptors = append(unaryInterceptors, i.unary)
+	}
+
+	return []grpc.ServerOption{
+		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(streamInterceptors...)),
+		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(unaryInterceptors...)),
+	}
+}
 
 func run(laddr string) error {
 	grpc.EnableTracing = true
@@ -41,7 +67,8 @@ func run(laddr string) error {
 	grpcL := m.Match(cmux.HTTP2HeaderField("content-type", "application/grpc"))
 	httpL := m.Match(cmux.HTTP1Fast())
 
-	gs := grpc.NewServer()
+	gs := grpc.NewServer(interceptors()...)
+
 	reflection.Register(gs)
 	grpc_prometheus.Register(gs)
 	mux.Handle("/metrics", promhttp.Handler())

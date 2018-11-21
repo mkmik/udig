@@ -6,6 +6,7 @@ require (
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/protobuf v1.2.0
 	github.com/googleapis/googleapis v0.0.0-20181120215828-b7a1d68ea384 // indirect
+	github.com/grpc-ecosystem/go-grpc-middleware v1.0.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/juju/errors v0.0.0-20181118221551-089d3ea4e4d5
 	github.com/prometheus/client_golang v0.9.1
