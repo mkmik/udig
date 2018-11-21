@@ -20,6 +20,7 @@ import (
 	"github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/hashicorp/yamux"
 	"github.com/juju/errors"
+	"github.com/mmikulicic/stringlist"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	forwarded "github.com/stanvit/go-forwarded"
 	"golang.org/x/net/trace"
@@ -30,6 +31,8 @@ import (
 var (
 	laddr = flag.String("http", "", "listen address for http server (for debug, metrics)")
 	taddr = flag.String("addr", "", "tunnel broker address")
+
+	ingressPorts = stringlist.Flag("ingress-port", "requested ingress port(s); comma separated or repeated flag)")
 )
 
 func interceptors() []grpc.ServerOption {
@@ -121,12 +124,12 @@ func listen(up *uplink.Server, laddr string) error {
 	return errors.Trace(m.Serve())
 }
 
-func run(laddr, taddr string) error {
+func run(laddr, taddr string, ingressPorts []int32) error {
 	grpc.EnableTracing = true
 	grpc_prometheus.EnableHandlingTimeHistogram()
 	trace.AuthRequest = func(*http.Request) (bool, bool) { return true, true }
 
-	up, err := uplink.NewServer()
+	up, err := uplink.NewServer(ingressPorts)
 	if err != nil {
 		return errors.Trace(err)
 	}
@@ -144,7 +147,12 @@ func main() {
 		glog.Exitf("missing mandatory -addr")
 	}
 
-	if err := run(*laddr, *taddr); err != nil {
+	ingressPortNums, err := uplink.ParseIngressPorts(*ingressPorts)
+	if err != nil {
+		glog.Exitf("%v", err)
+	}
+
+	if err := run(*laddr, *taddr, ingressPortNums); err != nil {
 		glog.Fatalf("%+v", err)
 	}
 }

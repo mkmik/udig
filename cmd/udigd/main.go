@@ -13,12 +13,14 @@ import (
 	_ "net/http/pprof"
 
 	"github.com/bitnami-labs/promhttpmux"
+	"github.com/bitnami-labs/udig/pkg/uplink"
 	"github.com/bitnami-labs/udig/pkg/uplink/uplinkpb"
 	"github.com/golang/glog"
 	"github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/hashicorp/yamux"
 	cid "github.com/ipfs/go-cid"
 	"github.com/juju/errors"
+	"github.com/mmikulicic/stringlist"
 	multibase "github.com/multiformats/go-multibase"
 	"github.com/multiformats/go-multihash"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -38,9 +40,11 @@ var (
 	uaddr  = flag.String("uplink", ":4000", "uplink callback listening address:port")
 	haddr  = flag.String("http", "", "debug/metrics http server listening address:port")
 	domain = flag.String("domain", "udig.io", "domain name used for ingress adresses")
+
+	ports = stringlist.Flag("port", "enabled ingress port(s); comma separated or repeated flag)")
 )
 
-func handleUplink(ctx context.Context, conn *grpc.ClientConn, domain string) (err error) {
+func handleUplink(ctx context.Context, conn *grpc.ClientConn, domain string, enabledPorts []int32) (err error) {
 	defer conn.Close()
 
 	up := uplinkpb.NewUplinkClient(conn)
@@ -86,7 +90,7 @@ func handleUplink(ctx context.Context, conn *grpc.ClientConn, domain string) (er
 	glog.Infof("setting up uplink for tunnel %s", tid)
 
 	var ins []string
-	for _, port := range req.Ports {
+	for _, port := range effectivePorts(req.Ports, enabledPorts) {
 		ins = append(ins, fmt.Sprintf("%s.%s:%d", tid, domain, port))
 	}
 
@@ -104,6 +108,21 @@ func handleUplink(ctx context.Context, conn *grpc.ClientConn, domain string) (er
 	return nil
 }
 
+func effectivePorts(requestedPorts, enabledPorts []int32) []int32 {
+	rpm := map[int32]bool{}
+	for _, port := range requestedPorts {
+		rpm[port] = true
+	}
+
+	var res []int32
+	for _, port := range enabledPorts {
+		if len(rpm) == 0 || rpm[port] {
+			res = append(res, port)
+		}
+	}
+	return res
+}
+
 func mkTunnelID(publicKey []byte) (string, error) {
 	mh, err := multihash.Sum(publicKey, multihash.SHA2_256, -1)
 	if err != nil {
@@ -113,7 +132,7 @@ func mkTunnelID(publicKey []byte) (string, error) {
 	return c.Encode(multibase.MustNewEncoder(multibase.Base32)), nil
 }
 
-func listenUplink(uaddr, domain string) {
+func listenUplink(uaddr, domain string, enabledPorts []int32) {
 	lis, err := net.Listen("tcp", uaddr)
 	if err != nil {
 		glog.Fatalf("could not listen: %v", err)
@@ -143,7 +162,7 @@ func listenUplink(uaddr, domain string) {
 		go func() {
 			glog.Infof("Handling uplink from %q", incoming.RemoteAddr())
 
-			if err := handleUplink(context.Background(), conn, domain); err != nil {
+			if err := handleUplink(context.Background(), conn, domain, enabledPorts); err != nil {
 				glog.Errorf("%+v", err)
 			}
 		}()
@@ -162,12 +181,12 @@ func listenHttp(haddr string) error {
 	return errors.Trace(http.ListenAndServe(haddr, clientIPWrapper.Handler(promhttpmux.Instrument(mux))))
 }
 
-func run(uaddr, haddr, domain string) error {
+func run(uaddr, haddr, domain string, ports []int32) error {
 	grpc.EnableTracing = true
 	grpc_prometheus.EnableHandlingTimeHistogram()
 	trace.AuthRequest = func(*http.Request) (bool, bool) { return true, true }
 
-	go listenUplink(uaddr, domain)
+	go listenUplink(uaddr, domain, ports)
 
 	return errors.Trace(listenHttp(haddr))
 }
@@ -176,7 +195,12 @@ func main() {
 	flag.Parse()
 	defer glog.Flush()
 
-	if err := run(*uaddr, *haddr, *domain); err != nil {
+	enabledPorts, err := uplink.ParseIngressPorts(*ports)
+	if err != nil {
+		glog.Exitf("%v", err)
+	}
+
+	if err := run(*uaddr, *haddr, *domain, enabledPorts); err != nil {
 		glog.Fatalf("%+v", err)
 	}
 }
