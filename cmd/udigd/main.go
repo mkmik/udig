@@ -9,6 +9,8 @@ import (
 	_ "net/http/pprof"
 
 	"github.com/bitnami-labs/promhttpmux"
+	"github.com/bitnami-labs/udig/pkg/uplink"
+	"github.com/bitnami-labs/udig/pkg/uplink/uplinkpb"
 	"github.com/cockroachdb/cmux"
 	"github.com/golang/glog"
 	"github.com/grpc-ecosystem/go-grpc-middleware"
@@ -72,6 +74,12 @@ func run(laddr string) error {
 	reflection.Register(gs)
 	grpc_prometheus.Register(gs)
 	mux.Handle("/metrics", promhttp.Handler())
+
+	us, err := uplink.NewServer()
+	if err != nil {
+		return errors.Trace(err)
+	}
+	uplinkpb.RegisterUplinkServer(gs, us)
 
 	// Make r.RemoteAddr honour the X-Forwarded-For header set by our load balancer (k8s ingress).
 	clientIPWrapper, _ := forwarded.New("0.0.0.0/0", false, false, "X-Forwarded-For", "X-Forwarded-Protocol")
