@@ -2,16 +2,12 @@ package uplink
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/bitnami-labs/udig/pkg/uplink/uplinkpb"
+
 	"github.com/golang/glog"
 	"github.com/juju/errors"
 	"golang.org/x/crypto/ed25519"
-)
-
-const (
-	DefaultIngressPort = 443
 )
 
 type Server struct {
@@ -58,19 +54,4 @@ func (s *Server) Setup(cxt context.Context, req *uplinkpb.SetupRequest) (*uplink
 	} else {
 		return &uplinkpb.SetupResponse{}, nil
 	}
-}
-
-func ParseIngressPorts(portStrings []string) ([]int32, error) {
-	var res []int32
-	for _, p := range portStrings {
-		i, err := strconv.Atoi(p)
-		if err != nil {
-			return nil, errors.Errorf("port number %q is not a number: %v", p, err)
-		}
-		res = append(res, int32(i))
-	}
-	if len(res) == 0 {
-		res = []int32{DefaultIngressPort}
-	}
-	return res, nil
 }

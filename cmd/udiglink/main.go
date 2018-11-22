@@ -11,6 +11,7 @@ import (
 	_ "net/http/pprof"
 
 	"github.com/bitnami-labs/promhttpmux"
+	"github.com/bitnami-labs/udig/pkg/ingress"
 	"github.com/bitnami-labs/udig/pkg/uplink"
 	"github.com/bitnami-labs/udig/pkg/uplink/uplinkpb"
 	"github.com/cockroachdb/cmux"
@@ -147,7 +148,7 @@ func main() {
 		glog.Exitf("missing mandatory -addr")
 	}
 
-	ingressPortNums, err := uplink.ParseIngressPorts(*ingressPorts)
+	ingressPortNums, err := ingress.ParsePorts(*ingressPorts)
 	if err != nil {
 		glog.Exitf("%v", err)
 	}
