@@ -188,6 +188,10 @@ func run(uaddr, haddr, domain string, ports []int32) error {
 
 	go listenUplink(uaddr, domain, ports)
 
+	for _, p := range ports {
+		go ingress.Listen(p)
+	}
+
 	return errors.Trace(listenHttp(haddr))
 }
 
