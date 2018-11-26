@@ -42,7 +42,7 @@ func Siphon(ctx context.Context, tunnel tunnelpb.TunnelClient, header *tunnelpb.
 			s.Send(&tunnelpb.Up{
 				Header: header,
 				Data:   data[:n],
-				Finish: finish,
+				Finish: finish, // TODO(mkm): figure out if we really need this in this direction.
 			})
 			if err == io.EOF {
 				s.CloseSend()
@@ -63,7 +63,8 @@ func Siphon(ctx context.Context, tunnel tunnelpb.TunnelClient, header *tunnelpb.
 				glog.Errorf("got down error: %v", err)
 				break
 			}
-			glog.Infof("got down: %v", down)
+			glog.V(2).Infof("got down: %v", down)
+			conn.Write(down.Data)
 		}
 		glog.Infof("done with down siphoning")
 	}()
