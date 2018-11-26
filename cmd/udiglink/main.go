@@ -54,6 +54,7 @@ type KeyPair struct {
 	Private ed25519.PrivateKey `json:"private"`
 }
 
+// registerGRPC is a callback that is used to install gRPC services on a gRPC server.
 type registerGRPC func(*grpc.Server)
 
 func interceptors() []grpc.ServerOption {
