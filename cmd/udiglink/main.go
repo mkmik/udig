@@ -14,7 +14,9 @@ import (
 	_ "net/http/pprof"
 
 	"github.com/bitnami-labs/promhttpmux"
+	"github.com/bitnami-labs/udig/pkg/egress"
 	"github.com/bitnami-labs/udig/pkg/ingress"
+	"github.com/bitnami-labs/udig/pkg/tunnel/tunnelpb"
 	"github.com/bitnami-labs/udig/pkg/uplink"
 	"github.com/bitnami-labs/udig/pkg/uplink/uplinkpb"
 	"github.com/cockroachdb/cmux"
@@ -37,6 +39,7 @@ import (
 var (
 	laddr = flag.String("http", "", "listen address for http server (for debug, metrics)")
 	taddr = flag.String("addr", "", "tunnel broker address")
+	eaddr = flag.String("egress", "", "egress host:port")
 
 	ingressPorts = stringlist.Flag("ingress-port", "requested ingress port(s); comma separated or repeated flag)")
 	keyPairFile  = flag.String("keypair", filepath.Join(configDir, "keypair.json"), "Keypair file")
@@ -74,21 +77,23 @@ func interceptors() []grpc.ServerOption {
 	}
 }
 
-func serve(up *uplink.Server, conn net.Listener) error {
+func serve(up *uplink.Server, eg *egress.Server, conn net.Listener) error {
 	gs := grpc.NewServer(interceptors()...)
 
 	reflection.Register(gs)
-	uplinkpb.RegisterUplinkServer(gs, up)
 	grpc_prometheus.Register(gs)
+
+	uplinkpb.RegisterUplinkServer(gs, up)
+	tunnelpb.RegisterTunnelServer(gs, eg)
 
 	glog.Infof("serving on %q", conn.Addr())
 	return errors.Trace(gs.Serve(conn))
 }
 
 // keepDialing retries connecting when the connection fails
-func keepDialing(up *uplink.Server, taddr string) {
+func keepDialing(up *uplink.Server, eg *egress.Server, taddr string) {
 	for {
-		if err := dial(up, taddr); err != nil {
+		if err := dial(up, eg, taddr); err != nil {
 			glog.Errorf("%+v", err)
 			time.Sleep(1 * time.Second)
 		}
@@ -97,7 +102,7 @@ func keepDialing(up *uplink.Server, taddr string) {
 
 // dial connects to a tunnel broker and sets up a grpc service listening
 // in reverse through the client connection.
-func dial(up *uplink.Server, taddr string) error {
+func dial(up *uplink.Server, eg *egress.Server, taddr string) error {
 	conn, err := net.DialTimeout("tcp", taddr, time.Second*5)
 	if err != nil {
 		return errors.Annotatef(err, "error dialing: %s", taddr)
@@ -108,11 +113,11 @@ func dial(up *uplink.Server, taddr string) error {
 		log.Fatalf("couldn't create yamux server: %s", err)
 	}
 
-	return errors.Trace(serve(up, grpcL))
+	return errors.Trace(serve(up, eg, grpcL))
 }
 
 // listen spawns a http server for debug (pprof, tracing, local debug uplink protocol)
-func listen(up *uplink.Server, laddr string) error {
+func listen(up *uplink.Server, eg *egress.Server, laddr string) error {
 	if laddr == "" {
 		select {}
 	}
@@ -134,7 +139,7 @@ func listen(up *uplink.Server, laddr string) error {
 
 	// Actually serve gRPC and HTTP
 	go http.Serve(httpL, clientIPWrapper.Handler(promhttpmux.Instrument(mux)))
-	go serve(up, grpcL)
+	go serve(up, eg, grpcL)
 
 	// Serve the multiplexer and block
 	return errors.Trace(m.Serve())
@@ -173,7 +178,7 @@ func ensureKeypair(keyPairFile string) (ed25519.PublicKey, ed25519.PrivateKey, e
 	return keypair.Public, keypair.Private, nil
 }
 
-func run(laddr, taddr string, ingressPorts []int32, keyPairFile string) error {
+func run(laddr, taddr, eaddr string, ingressPorts []int32, keyPairFile string) error {
 	grpc.EnableTracing = true
 	grpc_prometheus.EnableHandlingTimeHistogram()
 	trace.AuthRequest = func(*http.Request) (bool, bool) { return true, true }
@@ -188,9 +193,14 @@ func run(laddr, taddr string, ingressPorts []int32, keyPairFile string) error {
 		return errors.Trace(err)
 	}
 
-	go keepDialing(up, taddr)
+	eg, err := egress.NewServer(eaddr)
+	if err != nil {
+		return errors.Trace(err)
+	}
 
-	return errors.Trace(listen(up, laddr))
+	go keepDialing(up, eg, taddr)
+
+	return errors.Trace(listen(up, eg, laddr))
 }
 
 func main() {
@@ -199,6 +209,10 @@ func main() {
 
 	if *taddr == "" {
 		glog.Exitf("missing mandatory -addr")
+	}
+
+	if *eaddr == "" {
+		glog.Exitf("missing mandatory -egress")
 	}
 
 	ingressPortNums, err := ingress.ParsePorts(*ingressPorts)
@@ -211,7 +225,7 @@ func main() {
 		glog.Fatalf("%+v", err)
 	}
 
-	if err := run(*laddr, *taddr, ingressPortNums, keyPairFile); err != nil {
+	if err := run(*laddr, *taddr, *eaddr, ingressPortNums, keyPairFile); err != nil {
 		glog.Fatalf("%+v", err)
 	}
 }

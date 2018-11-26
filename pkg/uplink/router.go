@@ -1,8 +1,10 @@
 package uplink
 
 import (
+	"context"
 	"net"
 
+	"github.com/bitnami-labs/udig/pkg/tunnel"
 	"github.com/bitnami-labs/udig/pkg/tunnel/tunnelpb"
 	"github.com/golang/glog"
 )
@@ -77,6 +79,8 @@ func (r *InProcessRouter) run() {
 			for _, up := range r.m[in.TunnelID] {
 				found = true
 				glog.Infof("TODO using %v", up)
+				hdr := tunnel.HeaderFor(in.TunnelID, in.Conn)
+				tunnel.Siphon(context.Background(), up, hdr, in.Conn)
 				break
 			}
 
