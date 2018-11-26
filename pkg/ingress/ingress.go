@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/bitnami-labs/udig/pkg/uplink"
 	"github.com/golang/glog"
@@ -46,8 +47,19 @@ func Listen(port int32, cert tls.Certificate, forward chan<- uplink.NewStream) e
 			glog.Errorf("%+v", err)
 			continue
 		}
-		glog.Infof("accepted conn %p from %s", conn, conn.RemoteAddr())
-		forward <- uplink.NewStream{TunnelID: "1234", Conn: conn}
+		t := conn.(*tls.Conn)
+
+		// explicit hanshake is needed because we need to read the SNI value
+		// out of the connection state before doing any read/write operation.
+		if err := t.Handshake(); err != nil {
+			glog.Errorf("%+v", err)
+			continue
+		}
+
+		glog.Infof("accepted conn %p from %s for %s", conn, conn.RemoteAddr(), t.ConnectionState().ServerName)
+
+		c := strings.SplitN(t.ConnectionState().ServerName, ".", 2)
+		forward <- uplink.NewStream{TunnelID: c[0], Conn: conn}
 	}
 
 	return nil
