@@ -14,6 +14,7 @@ require (
 	github.com/juju/errors v0.0.0-20181118221551-089d3ea4e4d5
 	github.com/minio/blake2b-simd v0.0.0-20160723061019-3f5f724cb5b1 // indirect
 	github.com/minio/sha256-simd v0.0.0-20181005183134-51976451ce19 // indirect
+	github.com/mitchellh/go-homedir v1.0.0
 	github.com/mmikulicic/stringlist v0.0.0-20170411212101-a0d1ef9a7ccb
 	github.com/mr-tron/base58 v1.1.0 // indirect
 	github.com/multiformats/go-multibase v0.3.0

@@ -1,10 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"log"
 	"net"
 	"net/http"
+	"os"
+	"path/filepath"
 	"time"
 
 	// registers debug handlers
@@ -21,9 +24,11 @@ import (
 	"github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/hashicorp/yamux"
 	"github.com/juju/errors"
+	"github.com/mitchellh/go-homedir"
 	"github.com/mmikulicic/stringlist"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	forwarded "github.com/stanvit/go-forwarded"
+	"golang.org/x/crypto/ed25519"
 	"golang.org/x/net/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -34,7 +39,17 @@ var (
 	taddr = flag.String("addr", "", "tunnel broker address")
 
 	ingressPorts = stringlist.Flag("ingress-port", "requested ingress port(s); comma separated or repeated flag)")
+	keyPairFile  = flag.String("keypair", filepath.Join(configDir, "keypair.json"), "Keypair file")
 )
+
+const (
+	configDir = "~/.config/udiglink"
+)
+
+type KeyPair struct {
+	Public  ed25519.PublicKey  `json:"public"`
+	Private ed25519.PrivateKey `json:"private"`
+}
 
 func interceptors() []grpc.ServerOption {
 	interceptors := []struct {
@@ -125,12 +140,50 @@ func listen(up *uplink.Server, laddr string) error {
 	return errors.Trace(m.Serve())
 }
 
-func run(laddr, taddr string, ingressPorts []int32) error {
+func ensureKeypair(keyPairFile string) (ed25519.PublicKey, ed25519.PrivateKey, error) {
+	var keypair KeyPair
+	f, err := os.Open(keyPairFile)
+	if os.IsNotExist(err) {
+		pub, priv, err := ed25519.GenerateKey(nil)
+		if err != nil {
+			return nil, nil, errors.Trace(err)
+		}
+		keypair.Public = pub
+		keypair.Private = priv
+
+		if err := os.MkdirAll(filepath.Dir(keyPairFile), 0700); err != nil {
+			return nil, nil, errors.Trace(err)
+		}
+		f, err := os.Create(keyPairFile)
+		if err != nil {
+			return nil, nil, errors.Trace(err)
+		}
+		defer f.Close()
+		if err := json.NewEncoder(f).Encode(&keypair); err != nil {
+			return nil, nil, errors.Trace(err)
+		}
+	} else if err != nil {
+		return nil, nil, errors.Trace(err)
+	} else {
+		defer f.Close()
+		if err := json.NewDecoder(f).Decode(&keypair); err != nil {
+			return nil, nil, errors.Trace(err)
+		}
+	}
+	return keypair.Public, keypair.Private, nil
+}
+
+func run(laddr, taddr string, ingressPorts []int32, keyPairFile string) error {
 	grpc.EnableTracing = true
 	grpc_prometheus.EnableHandlingTimeHistogram()
 	trace.AuthRequest = func(*http.Request) (bool, bool) { return true, true }
 
-	up, err := uplink.NewServer(ingressPorts)
+	pub, priv, err := ensureKeypair(keyPairFile)
+	if err != nil {
+		return errors.Trace(err)
+	}
+
+	up, err := uplink.NewServer(ingressPorts, pub, priv)
 	if err != nil {
 		return errors.Trace(err)
 	}
@@ -153,7 +206,12 @@ func main() {
 		glog.Exitf("%v", err)
 	}
 
-	if err := run(*laddr, *taddr, ingressPortNums); err != nil {
+	keyPairFile, err := homedir.Expand(*keyPairFile)
+	if err != nil {
+		glog.Fatalf("%+v", err)
+	}
+
+	if err := run(*laddr, *taddr, ingressPortNums, keyPairFile); err != nil {
 		glog.Fatalf("%+v", err)
 	}
 }

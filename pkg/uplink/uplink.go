@@ -6,7 +6,6 @@ import (
 	"github.com/bitnami-labs/udig/pkg/uplink/uplinkpb"
 
 	"github.com/golang/glog"
-	"github.com/juju/errors"
 	"golang.org/x/crypto/ed25519"
 )
 
@@ -18,12 +17,7 @@ type Server struct {
 
 var _ uplinkpb.UplinkServer = (*Server)(nil)
 
-func NewServer(ingressPorts []int32) (*Server, error) {
-	pub, priv, err := ed25519.GenerateKey(nil)
-	if err != nil {
-		return nil, errors.Trace(err)
-	}
-
+func NewServer(ingressPorts []int32, pub ed25519.PublicKey, priv ed25519.PrivateKey) (*Server, error) {
 	return &Server{
 		privateKey: priv,
 		PublicKey:  pub,
