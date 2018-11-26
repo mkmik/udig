@@ -10,6 +10,10 @@ import (
 	"github.com/juju/errors"
 )
 
+const (
+	DefaultDataFrameSize = 1024 * 16
+)
+
 // HeaderFor returns a header for a given tunnel ID and connection.
 func HeaderFor(tunnelID string, conn net.Conn) *tunnelpb.Up_Header {
 	return &tunnelpb.Up_Header{
@@ -28,7 +32,7 @@ func Siphon(ctx context.Context, tunnel tunnelpb.TunnelClient, header *tunnelpb.
 	}
 
 	go func() {
-		data := make([]byte, 8092)
+		data := make([]byte, DefaultDataFrameSize)
 
 		for {
 			finish := false
@@ -63,6 +67,7 @@ func Siphon(ctx context.Context, tunnel tunnelpb.TunnelClient, header *tunnelpb.
 				glog.Errorf("got down error: %v", err)
 				break
 			}
+			glog.Infof("receiving %d bytes down", len(down.Data))
 			glog.V(2).Infof("got down: %v", down)
 			conn.Write(down.Data)
 		}

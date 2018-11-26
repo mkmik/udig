@@ -5,6 +5,7 @@ import (
 	"io"
 	"net"
 
+	"github.com/bitnami-labs/udig/pkg/tunnel"
 	"github.com/bitnami-labs/udig/pkg/tunnel/tunnelpb"
 	"github.com/golang/glog"
 )
@@ -50,7 +51,7 @@ func (eg *Server) NewStream(s tunnelpb.Tunnel_NewStreamServer) error {
 		}
 	}()
 
-	buf := make([]byte, 8092)
+	buf := make([]byte, tunnel.DefaultDataFrameSize)
 	for {
 		finish := false
 
