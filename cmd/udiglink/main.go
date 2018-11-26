@@ -54,6 +54,8 @@ type KeyPair struct {
 	Private ed25519.PrivateKey `json:"private"`
 }
 
+type registerGRPC func(*grpc.Server)
+
 func interceptors() []grpc.ServerOption {
 	interceptors := []struct {
 		stream grpc.StreamServerInterceptor
@@ -77,23 +79,22 @@ func interceptors() []grpc.ServerOption {
 	}
 }
 
-func serve(up *uplink.Server, eg *egress.Server, conn net.Listener) error {
+func serve(reg registerGRPC, conn net.Listener) error {
 	gs := grpc.NewServer(interceptors()...)
 
 	reflection.Register(gs)
 	grpc_prometheus.Register(gs)
 
-	uplinkpb.RegisterUplinkServer(gs, up)
-	tunnelpb.RegisterTunnelServer(gs, eg)
+	reg(gs)
 
 	glog.Infof("serving on %q", conn.Addr())
 	return errors.Trace(gs.Serve(conn))
 }
 
 // keepDialing retries connecting when the connection fails
-func keepDialing(up *uplink.Server, eg *egress.Server, taddr string) {
+func keepDialing(reg registerGRPC, taddr string) {
 	for {
-		if err := dial(up, eg, taddr); err != nil {
+		if err := dial(reg, taddr); err != nil {
 			glog.Errorf("%+v", err)
 			time.Sleep(1 * time.Second)
 		}
@@ -102,7 +103,7 @@ func keepDialing(up *uplink.Server, eg *egress.Server, taddr string) {
 
 // dial connects to a tunnel broker and sets up a grpc service listening
 // in reverse through the client connection.
-func dial(up *uplink.Server, eg *egress.Server, taddr string) error {
+func dial(reg registerGRPC, taddr string) error {
 	conn, err := net.DialTimeout("tcp", taddr, time.Second*5)
 	if err != nil {
 		return errors.Annotatef(err, "error dialing: %s", taddr)
@@ -113,11 +114,11 @@ func dial(up *uplink.Server, eg *egress.Server, taddr string) error {
 		log.Fatalf("couldn't create yamux server: %s", err)
 	}
 
-	return errors.Trace(serve(up, eg, grpcL))
+	return errors.Trace(serve(reg, grpcL))
 }
 
 // listen spawns a http server for debug (pprof, tracing, local debug uplink protocol)
-func listen(up *uplink.Server, eg *egress.Server, laddr string) error {
+func listen(reg registerGRPC, laddr string) error {
 	if laddr == "" {
 		select {}
 	}
@@ -139,7 +140,7 @@ func listen(up *uplink.Server, eg *egress.Server, laddr string) error {
 
 	// Actually serve gRPC and HTTP
 	go http.Serve(httpL, clientIPWrapper.Handler(promhttpmux.Instrument(mux)))
-	go serve(up, eg, grpcL)
+	go serve(reg, grpcL)
 
 	// Serve the multiplexer and block
 	return errors.Trace(m.Serve())
@@ -198,9 +199,14 @@ func run(laddr, taddr, eaddr string, ingressPorts []int32, keyPairFile string) e
 		return errors.Trace(err)
 	}
 
-	go keepDialing(up, eg, taddr)
+	reg := func(gs *grpc.Server) {
+		uplinkpb.RegisterUplinkServer(gs, up)
+		tunnelpb.RegisterTunnelServer(gs, eg)
+	}
 
-	return errors.Trace(listen(up, eg, laddr))
+	go keepDialing(reg, taddr)
+
+	return errors.Trace(listen(reg, laddr))
 }
 
 func main() {
