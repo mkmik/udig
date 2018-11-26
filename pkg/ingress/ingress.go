@@ -3,11 +3,9 @@ package ingress
 import (
 	"crypto/tls"
 	"fmt"
-	"io"
-	"net"
-	"os"
 	"strconv"
 
+	"github.com/bitnami-labs/udig/pkg/uplink"
 	"github.com/golang/glog"
 	"github.com/juju/errors"
 )
@@ -31,7 +29,7 @@ func ParsePorts(portStrings []string) ([]int32, error) {
 	return res, nil
 }
 
-func Listen(port int32, cert tls.Certificate) error {
+func Listen(port int32, cert tls.Certificate, forward chan<- uplink.NewStream) error {
 	glog.Infof("listening ingress on %d", port)
 
 	cfg := &tls.Config{
@@ -48,14 +46,9 @@ func Listen(port int32, cert tls.Certificate) error {
 			glog.Errorf("%+v", err)
 			continue
 		}
-		go handle(conn)
+		glog.Infof("accepted conn %p from %s", conn, conn.RemoteAddr())
+		forward <- uplink.NewStream{TunnelID: "1234", Conn: conn}
 	}
 
 	return nil
-}
-
-func handle(conn net.Conn) {
-	glog.Infof("accepted conn %p from %s", conn, conn.RemoteAddr())
-	_, err := io.Copy(os.Stdout, conn)
-	glog.Infof("done handling %p, err: %v", conn, err)
 }

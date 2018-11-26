@@ -15,6 +15,8 @@ import (
 
 	"github.com/bitnami-labs/promhttpmux"
 	"github.com/bitnami-labs/udig/pkg/ingress"
+	"github.com/bitnami-labs/udig/pkg/tunnel/tunnelpb"
+	"github.com/bitnami-labs/udig/pkg/uplink"
 	"github.com/bitnami-labs/udig/pkg/uplink/uplinkpb"
 	"github.com/golang/glog"
 	"github.com/grpc-ecosystem/go-grpc-prometheus"
@@ -48,7 +50,7 @@ var (
 	keyPath  = flag.String("key", "", "path to PEM encoded private key for ingress server")
 )
 
-func handleUplink(ctx context.Context, conn *grpc.ClientConn, domain string, enabledPorts []int32) (err error) {
+func handleUplink(ctx context.Context, conn *grpc.ClientConn, domain string, enabledPorts []int32, changeUplink chan<- uplink.UplinkChange) (err error) {
 	defer conn.Close()
 
 	up := uplinkpb.NewUplinkClient(conn)
@@ -109,6 +111,20 @@ func handleUplink(ctx context.Context, conn *grpc.ClientConn, domain string, ena
 		return errors.Trace(err)
 	}
 
+	changeUplink <- uplink.UplinkChange{
+		TunnelID: tid,
+		UplinkID: conn.Target(),
+		Client:   tunnelpb.NewTunnelClient(conn),
+	}
+
+	<-ctx.Done()
+
+	changeUplink <- uplink.UplinkChange{
+		TunnelID: tid,
+		UplinkID: conn.Target(),
+		Client:   nil,
+	}
+
 	return nil
 }
 
@@ -136,7 +152,21 @@ func mkTunnelID(publicKey []byte) (string, error) {
 	return c.Encode(multibase.MustNewEncoder(multibase.Base32)), nil
 }
 
-func listenUplink(uaddr, domain string, enabledPorts []int32) {
+func randomUplinkID() (string, error) {
+	id := make([]byte, 32)
+	_, err := rand.Read(id)
+	if err != nil {
+		return "", errors.Trace(err)
+	}
+	mh, err := multihash.Sum(id, multihash.SHA2_256, -1)
+	if err != nil {
+		return "", errors.Trace(err)
+	}
+	c := cid.NewCidV1(cid.Raw, mh)
+	return c.Encode(multibase.MustNewEncoder(multibase.Base32)), nil
+}
+
+func listenUplink(uaddr, domain string, enabledPorts []int32, changeUplink chan<- uplink.UplinkChange) {
 	lis, err := net.Listen("tcp", uaddr)
 	if err != nil {
 		glog.Fatalf("could not listen: %v", err)
@@ -154,7 +184,12 @@ func listenUplink(uaddr, domain string, enabledPorts []int32) {
 			glog.Fatalf("couldn't create yamux %v", err)
 		}
 
-		conn, err := grpc.Dial(":7777", grpc.WithInsecure(),
+		uplinkID, err := randomUplinkID()
+		if err != nil {
+			glog.Fatalf("%+v", err)
+		}
+
+		conn, err := grpc.Dial(uplinkID, grpc.WithInsecure(),
 			grpc.WithDialer(func(target string, timeout time.Duration) (net.Conn, error) {
 				return incomingConn.Open()
 			}),
@@ -163,10 +198,20 @@ func listenUplink(uaddr, domain string, enabledPorts []int32) {
 			glog.Fatalf("did not connect: %s", err)
 		}
 
+		ctx, cancel := context.WithCancel(context.Background())
+		go func() {
+			<-incomingConn.CloseChan()
+			cancel()
+		}()
+
+		// handleUplink now doesn't have to be aware of the underyling transport contortions
+		// and can work with a high level grpc connection. When the underlying connection goes away
+		// the context will be canceled.
+
 		go func() {
 			glog.Infof("Handling uplink from %q", incoming.RemoteAddr())
 
-			if err := handleUplink(context.Background(), conn, domain, enabledPorts); err != nil {
+			if err := handleUplink(ctx, conn, domain, enabledPorts, changeUplink); err != nil {
 				glog.Errorf("%+v", err)
 			}
 		}()
@@ -190,14 +235,16 @@ func run(uaddr, haddr, domain string, ports []int32, certPath, keyPath string) e
 	grpc_prometheus.EnableHandlingTimeHistogram()
 	trace.AuthRequest = func(*http.Request) (bool, bool) { return true, true }
 
-	go listenUplink(uaddr, domain, ports)
 	cert, err := tls.LoadX509KeyPair(certPath, keyPath)
 	if err != nil {
 		return errors.Trace(err)
 	}
 
+	mux := uplink.NewInProcessRouter()
+
+	go listenUplink(uaddr, domain, ports, mux.Uplink())
 	for _, p := range ports {
-		go ingress.Listen(p, cert)
+		go ingress.Listen(p, cert, mux.Ingress())
 	}
 
 	return errors.Trace(listenHttp(haddr))
