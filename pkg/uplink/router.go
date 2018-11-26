@@ -70,8 +70,19 @@ func (r *InProcessRouter) run() {
 
 		case in := <-r.ingress:
 			glog.Infof("got new stream request: %v", in)
-			if ups, ok := r.m[in.TunnelID]; ok {
-				glog.Infof("TODO: found uplink, forward to any of %v", ups)
+			// poor man's round robin based on the pseudo randomization that Go runtime provides
+			// to map key iteration order.
+			// TODO(mkm) use real round-robin
+			found := false
+			for _, up := range r.m[in.TunnelID] {
+				found = true
+				glog.Infof("TODO using %v", up)
+				break
+			}
+
+			if !found {
+				glog.Errorf("cannot find any uplink for tunnel %q", in.TunnelID)
+				in.Conn.Close()
 			}
 		}
 	}
