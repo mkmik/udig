@@ -55,6 +55,7 @@ func Listen(port int32, cert tls.Certificate) error {
 }
 
 func handle(conn net.Conn) {
-	glog.Infof("accepted conn %v", conn)
-	io.Copy(os.Stdout, conn)
+	glog.Infof("accepted conn %p from %s", conn, conn.RemoteAddr())
+	_, err := io.Copy(os.Stdout, conn)
+	glog.Infof("done handling %p, err: %v", conn, err)
 }
