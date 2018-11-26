@@ -31,10 +31,6 @@ func NewServer(ingressPorts []int32) (*Server, error) {
 	}, nil
 }
 
-func (s *Server) Ingress(server uplinkpb.Uplink_IngressServer) error {
-	return nil
-}
-
 func (s *Server) Register(ctx context.Context, req *uplinkpb.RegisterTrigger) (*uplinkpb.RegisterRequest, error) {
 	sig := ed25519.Sign(s.privateKey, req.Nonce)
 	return &uplinkpb.RegisterRequest{

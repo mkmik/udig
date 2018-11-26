@@ -7,7 +7,6 @@ option go_package = "uplinkpb";
 service Uplink {
   rpc Register(RegisterTrigger) returns (RegisterRequest);
   rpc Setup(SetupRequest) returns (SetupResponse);
-  rpc Ingress(stream Request) returns (stream Response);
 }
 
 message RegisterTrigger {
@@ -60,48 +59,3 @@ message SetupRequest {
 }
 
 message SetupResponse {}
-
-message Request {
-  // The tunnel broker conveys some information about the original session with the
-  // client hitting the ingress. This can be useful for logging or for a
-  // second level virtual hosting if the broker supports wildcard DNS.
-  message Header {
-    // <tunnel_id>.udig.io 
-    //     ^^^
-    string tunnel_id = 1;
-    string protocol = 2; // *must* be "TCP" for now.
-    string saddr = 3;
-    string daddr = 4;
-    int32 sport = 5;
-    int32 dport = 6;
-    string sni = 7; // e.g. foo.bar.<tunnel_id>.udig.io
-  }
-
-  // This **must** be set on the first `Request` of each `Ingress()` action.
-  // If it is set on subsequent calls, it **must** match the value of the
-  // first request.
-  Header header = 2;
-
-  // If `true`, this indicates that the send is complete. Sending any
-  // `Request`s subsequent to one in which `finish` is `true` will
-  // cause an error. (i.e. this allows each stream direction to be closed separately
-  // which is also what can happen to the tunneled TCP stream anyway).
-  bool finish = 3;
-
-  // A portion of the data for the resource. The client **may** leave `data`
-  // empty for any given `Request`. This enables the client to inform the
-  // service that the request is still live and more data might be coming.
-  bytes data = 4;
-}
-
-message Response {
-  // A portion of the data for the resource. The service **may** leave `data`
-  // empty for any given `Response`. This enables the service to inform the
-  // client that the request is still live and more data might be coming.
-  bytes data = 1;
-
-  // If `true`, this indicates that the send is complete. Sending any
-  // `Request`s subsequent to one in which `finish` is `true` will
-  // cause an error.
-  bool finish = 2;
-}
