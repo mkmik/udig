@@ -31,14 +31,11 @@ func ParsePorts(portStrings []string) ([]int32, error) {
 	return res, nil
 }
 
-func Listen(port int32) (err error) {
+func Listen(port int32, cert tls.Certificate) error {
 	glog.Infof("listening ingress on %d", port)
 
 	cfg := &tls.Config{
-		GetCertificate: func(info *tls.ClientHelloInfo) (*tls.Certificate, error) {
-			glog.Infof("Got hello with SNI %q", info.ServerName)
-			return nil, errors.Errorf("not implemented")
-		},
+		Certificates: []tls.Certificate{cert},
 	}
 	lis, err := tls.Listen("tcp", fmt.Sprintf(":%d", port), cfg)
 	if err != nil {

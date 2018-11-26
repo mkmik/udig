@@ -3,6 +3,7 @@ package main // imports "github.com/bitnami-labs/udig/cmd/udigd"
 import (
 	"context"
 	"crypto/rand"
+	"crypto/tls"
 	"flag"
 	"fmt"
 	"net"
@@ -42,6 +43,9 @@ var (
 	domain = flag.String("domain", "udig.io", "domain name used for ingress adresses")
 
 	ports = stringlist.Flag("port", "enabled ingress port(s); comma separated or repeated flag)")
+
+	certPath = flag.String("cert", "", "path to PEM encoded x509 certificate for ingress server")
+	keyPath  = flag.String("key", "", "path to PEM encoded private key for ingress server")
 )
 
 func handleUplink(ctx context.Context, conn *grpc.ClientConn, domain string, enabledPorts []int32) (err error) {
@@ -181,15 +185,19 @@ func listenHttp(haddr string) error {
 	return errors.Trace(http.ListenAndServe(haddr, clientIPWrapper.Handler(promhttpmux.Instrument(mux))))
 }
 
-func run(uaddr, haddr, domain string, ports []int32) error {
+func run(uaddr, haddr, domain string, ports []int32, certPath, keyPath string) error {
 	grpc.EnableTracing = true
 	grpc_prometheus.EnableHandlingTimeHistogram()
 	trace.AuthRequest = func(*http.Request) (bool, bool) { return true, true }
 
 	go listenUplink(uaddr, domain, ports)
+	cert, err := tls.LoadX509KeyPair(certPath, keyPath)
+	if err != nil {
+		return errors.Trace(err)
+	}
 
 	for _, p := range ports {
-		go ingress.Listen(p)
+		go ingress.Listen(p, cert)
 	}
 
 	return errors.Trace(listenHttp(haddr))
@@ -204,7 +212,11 @@ func main() {
 		glog.Exitf("%v", err)
 	}
 
-	if err := run(*uaddr, *haddr, *domain, enabledPorts); err != nil {
+	if *certPath == "" || *keyPath == "" {
+		glog.Exitf("-cert and -key are manadatory")
+	}
+
+	if err := run(*uaddr, *haddr, *domain, enabledPorts, *certPath, *keyPath); err != nil {
 		glog.Fatalf("%+v", err)
 	}
 }
