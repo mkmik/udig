@@ -3,6 +3,7 @@ package egress
 import (
 	"fmt"
 	"io"
+	"net"
 
 	"github.com/bitnami-labs/udig/pkg/tunnel/tunnelpb"
 	"github.com/golang/glog"
@@ -18,19 +19,56 @@ func NewServer(eaddr string) (*Server, error) {
 
 var _ tunnelpb.TunnelServer = (*Server)(nil)
 
+type closeWriter interface {
+	CloseWrite() error
+}
+
 func (eg *Server) NewStream(s tunnelpb.Tunnel_NewStreamServer) error {
-	// TODO(mkm): establish egress connection and do two way siphoning
+	cli, err := net.Dial("tcp", eg.eaddr)
+	if err != nil {
+		return err
+	}
+	defer cli.Close()
+
+	done := make(chan error, 1)
+	go func() (err error) {
+		defer func() {
+			glog.Infof("recv closed")
+			cli.(closeWriter).CloseWrite()
+			done <- err
+		}()
+
+		for {
+			up, err := s.Recv()
+			if err == io.EOF {
+				return nil
+			} else if err != nil {
+				return err
+			}
+			glog.V(2).Infof("got: %v", up)
+			fmt.Fprintf(cli, "%s", up.Data)
+		}
+	}()
+
+	buf := make([]byte, 8092)
 	for {
-		up, err := s.Recv()
+		finish := false
+
+		n, err := cli.Read(buf)
+		if err == io.EOF {
+			finish = true
+		}
+
+		s.Send(&tunnelpb.Down{
+			Data:   buf[:n],
+			Finish: finish,
+		})
 		if err == io.EOF {
 			break
 		} else if err != nil {
-			glog.Errorf("%T: %v", err, err)
 			return err
 		}
-		glog.V(2).Infof("got: %v", up)
-		fmt.Printf("%s", up.Data)
 	}
-	glog.Infof("new stream done")
-	return nil
+
+	return <-done
 }
