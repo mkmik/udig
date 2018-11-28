@@ -35,7 +35,7 @@ import (
 )
 
 const (
-	// this should live in multihash
+	// Ed25519Pub should live in multihash
 	Ed25519Pub = 0xed
 )
 
@@ -50,7 +50,7 @@ var (
 	keyPath  = flag.String("key", "", "path to PEM encoded private key for ingress server")
 )
 
-func handleUplink(ctx context.Context, conn *grpc.ClientConn, domain string, enabledPorts []int32, changeUplink chan<- uplink.UplinkChange) (err error) {
+func handleUplink(ctx context.Context, conn *grpc.ClientConn, domain string, enabledPorts []int32, changeUplink chan<- uplink.Change) (err error) {
 	defer conn.Close()
 
 	up := uplinkpb.NewUplinkClient(conn)
@@ -111,7 +111,7 @@ func handleUplink(ctx context.Context, conn *grpc.ClientConn, domain string, ena
 		return errors.Trace(err)
 	}
 
-	changeUplink <- uplink.UplinkChange{
+	changeUplink <- uplink.Change{
 		TunnelID: tid,
 		UplinkID: conn.Target(),
 		Client:   tunnelpb.NewTunnelClient(conn),
@@ -119,7 +119,7 @@ func handleUplink(ctx context.Context, conn *grpc.ClientConn, domain string, ena
 
 	<-ctx.Done()
 
-	changeUplink <- uplink.UplinkChange{
+	changeUplink <- uplink.Change{
 		TunnelID: tid,
 		UplinkID: conn.Target(),
 		Client:   nil,
@@ -166,7 +166,7 @@ func randomUplinkID() (string, error) {
 	return c.Encode(multibase.MustNewEncoder(multibase.Base32)), nil
 }
 
-func listenUplink(uaddr, domain string, enabledPorts []int32, changeUplink chan<- uplink.UplinkChange) {
+func listenUplink(uaddr, domain string, enabledPorts []int32, changeUplink chan<- uplink.Change) {
 	lis, err := net.Listen("tcp", uaddr)
 	if err != nil {
 		glog.Fatalf("could not listen: %v", err)
@@ -218,7 +218,7 @@ func listenUplink(uaddr, domain string, enabledPorts []int32, changeUplink chan<
 	}
 }
 
-func listenHttp(haddr string) error {
+func listenHTTP(haddr string) error {
 	if haddr == "" {
 		select {}
 	}
@@ -247,7 +247,7 @@ func run(uaddr, haddr, domain string, ports []int32, certPath, keyPath string) e
 		go ingress.Listen(p, cert, mux.Ingress())
 	}
 
-	return errors.Trace(listenHttp(haddr))
+	return errors.Trace(listenHTTP(haddr))
 }
 
 func main() {

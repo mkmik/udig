@@ -23,7 +23,7 @@ type Router interface {
 	Ingress() chan<- NewStream
 }
 
-type UplinkChange struct {
+type Change struct {
 	TunnelID string
 	UplinkID string                // something unique about the uplink connection
 	Client   tunnelpb.TunnelClient // if nil, uplink instance removed
@@ -32,14 +32,14 @@ type UplinkChange struct {
 // InProcessRouter connects uplinks and ingresses in the same process.
 type InProcessRouter struct {
 	ingress chan NewStream
-	uplink  chan UplinkChange
+	uplink  chan Change
 	m       map[string]map[string]tunnelpb.TunnelClient
 }
 
 func NewInProcessRouter() *InProcessRouter {
 	r := &InProcessRouter{
 		ingress: make(chan NewStream),
-		uplink:  make(chan UplinkChange),
+		uplink:  make(chan Change),
 		m:       map[string]map[string]tunnelpb.TunnelClient{},
 	}
 
@@ -48,7 +48,7 @@ func NewInProcessRouter() *InProcessRouter {
 }
 
 func (r *InProcessRouter) Ingress() chan<- NewStream   { return r.ingress }
-func (r *InProcessRouter) Uplink() chan<- UplinkChange { return r.uplink }
+func (r *InProcessRouter) Uplink() chan<- Change { return r.uplink }
 
 func (r *InProcessRouter) run() {
 	for {

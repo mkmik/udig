@@ -61,6 +61,4 @@ func Listen(port int32, cert tls.Certificate, forward chan<- uplink.NewStream) e
 		c := strings.SplitN(t.ConnectionState().ServerName, ".", 2)
 		forward <- uplink.NewStream{TunnelID: c[0], Conn: conn}
 	}
-
-	return nil
 }
