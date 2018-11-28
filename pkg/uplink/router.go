@@ -47,8 +47,8 @@ func NewInProcessRouter() *InProcessRouter {
 	return r
 }
 
-func (r *InProcessRouter) Ingress() chan<- NewStream   { return r.ingress }
-func (r *InProcessRouter) Uplink() chan<- Change { return r.uplink }
+func (r *InProcessRouter) Ingress() chan<- NewStream { return r.ingress }
+func (r *InProcessRouter) Uplink() chan<- Change     { return r.uplink }
 
 func (r *InProcessRouter) run() {
 	for {
