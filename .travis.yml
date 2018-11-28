@@ -6,9 +6,13 @@ go:
 os:
   - linux
 
+services:
+  - docker
+
 env:
   - GO111MODULE=on
 
 script:
   - go build ./...
   - go test -v ./...
+  - docker build -f Dockerfile-udigd -t mkmik/udigd .
