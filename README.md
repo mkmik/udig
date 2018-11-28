@@ -1,6 +1,7 @@
 # udig
 
 [![Build Status](https://travis-ci.com/bitnami-labs/udig.svg?branch=master)](https://travis-ci.com/bitnami-labs/udig)
+[![Go Report Card](https://goreportcard.com/badge/github.com/bitnami-labs/udig)](https://goreportcard.com/report/github.com/bitnami-labs/udig)
 
 udig is a public-key addressed TCP tunnel software. It allows anybody to expose a local network
 service through a public stable ingress, even if the local service is behind a NAT or firewall.
