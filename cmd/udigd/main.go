@@ -204,7 +204,7 @@ func listenUplink(uaddr, domain string, enabledPorts []int32, changeUplink chan<
 			cancel()
 		}()
 
-		// handleUplink now doesn't have to be aware of the underyling transport contortions
+		// handleUplink now doesn't have to be aware of the underlying transport contortions
 		// and can work with a high level grpc connection. When the underlying connection goes away
 		// the context will be canceled.
 
