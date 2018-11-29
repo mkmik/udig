@@ -49,6 +49,19 @@ curl  --connect-to ::127.0.0.1:8443 -k https://bahwqcerazdp76ea6rpuwvbbwxkjtypdn
 
 (use the actual hostname you get in `tunnel ingress addresses: ["bahw....` in Shell 1 for ^^^)
 
+> NOTE: This command requires `curl` version 7.49.0 or above.
+
+For earlier versions of `curl` this can be tested by adding the host to `/etc/hosts` file as `127.0.0.1` (or `C:\Windows\System32\drivers\etc\hosts` on Windows) - like:
+```
+127.0.0.1 bahwqcerazdp76ea6rpuwvbbwxkjtypdntmw4bohi6amkzkfz2kswpxlpgykq.udig.io
+```
+
+And then running the curl command with port 8443:
+
+```
+curl https://bahwqcerazdp76ea6rpuwvbbwxkjtypdntmw4bohi6amkzkfz2kswpxlpgykq.udig.io:8443/README.md
+```
+
 ## Off-the-shelf tunnel client example
 
 Udig forces you to use a TLS client and one that suppoers SNI nonetheless!
