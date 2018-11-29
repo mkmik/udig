@@ -19,7 +19,8 @@ script:
 deploy:
   provider: script
   script: |
-    docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD"
+    echo Pushing image to docker
+    echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
     docker push mkmik/udigd
   on:
     branch: master
