@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -88,7 +89,7 @@ func serve(reg registerGRPC, conn net.Listener) error {
 
 	reg(gs)
 
-	glog.Infof("serving on %q", conn.Addr())
+	glog.Infof("serving gRPC on on %q", conn.Addr())
 	return errors.Trace(gs.Serve(conn))
 }
 
@@ -190,7 +191,16 @@ func run(laddr, taddr, eaddr string, ingressPorts []int32, keyPairFile string) e
 		return errors.Trace(err)
 	}
 
-	up, err := uplink.NewServer(ingressPorts, pub, priv)
+	sup := make(chan uplink.StatusUpdate)
+	go func() {
+		for up := range sup {
+			for _, i := range up.Ingress {
+				fmt.Printf("%s\n", i)
+			}
+		}
+	}()
+
+	up, err := uplink.NewServer(ingressPorts, pub, priv, sup)
 	if err != nil {
 		return errors.Trace(err)
 	}

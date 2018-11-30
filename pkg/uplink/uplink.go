@@ -13,15 +13,21 @@ type Server struct {
 	privateKey ed25519.PrivateKey
 	PublicKey  ed25519.PublicKey
 	Ports      []int32
+	sup        chan<- StatusUpdate
 }
 
 var _ uplinkpb.UplinkServer = (*Server)(nil)
 
-func NewServer(ingressPorts []int32, pub ed25519.PublicKey, priv ed25519.PrivateKey) (*Server, error) {
+type StatusUpdate struct {
+	Ingress []string
+}
+
+func NewServer(ingressPorts []int32, pub ed25519.PublicKey, priv ed25519.PrivateKey, sup chan<- StatusUpdate) (*Server, error) {
 	return &Server{
 		privateKey: priv,
 		PublicKey:  pub,
 		Ports:      ingressPorts,
+		sup:        sup,
 	}, nil
 }
 
@@ -40,6 +46,9 @@ func (s *Server) Setup(cxt context.Context, req *uplinkpb.SetupRequest) (*uplink
 		return &uplinkpb.SetupResponse{}, nil
 	} else if in := req.GetIngress(); in != nil {
 		glog.Infof("tunnel ingress addresses: %q", in.Ingress)
+		if s.sup != nil {
+			s.sup <- StatusUpdate{Ingress: in.Ingress}
+		}
 		return &uplinkpb.SetupResponse{}, nil
 	} else {
 		return &uplinkpb.SetupResponse{}, nil
