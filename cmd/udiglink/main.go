@@ -177,7 +177,7 @@ func ensureKeypair(keyPairFile string) (ed25519.PublicKey, ed25519.PrivateKey, e
 			return nil, nil, errors.Trace(err)
 		}
 	}
-	glog.Infof("using key file: %s", keyPairFile)
+	fmt.Fprintf(os.Stderr, "using key file: %s\n", keyPairFile)
 	return keypair.Public, keypair.Private, nil
 }
 
