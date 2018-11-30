@@ -78,7 +78,6 @@ func (r *InProcessRouter) run() {
 			found := false
 			for _, up := range r.m[in.TunnelID] {
 				found = true
-				glog.Infof("TODO using %v", up)
 				hdr := tunnel.HeaderFor(in.TunnelID, in.Conn)
 				tunnel.Siphon(context.Background(), up, hdr, in.Conn)
 				break
