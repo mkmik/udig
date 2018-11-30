@@ -24,11 +24,38 @@ It has of two logical endpoints:
 * **ingress**: another endpoint is for connections entering the tunnel; traffic is then forwarded to any active uplink active matching a tunnel ID encoded in the TLS SNI field.
 
 
-Tunne IDs are base32 encoded hashes of the public key (technically a [multihash](https://github.com/multiformats/multihash) encoded as a base32 [multibase](https://github.com/multiformats/multibase)).
+Tunnel IDs are base32 encoded hashes of the public key (technically a [multihash](https://github.com/multiformats/multihash) encoded as a base32 [multibase](https://github.com/multiformats/multibase)).
 
 Tunnel ingress addresses look like this: bahwqcerazdp76ea6rpuwvbbwxkjtypdntmw4bohi6amkzkfz2kswpxlpgykq.udig.io
 
-## Example usage
+## Install
+
+This project uses the experimental Go modules support. Install by running this:
+
+```
+(T=$(mktemp); rm -rf "$T"; git clone https://github.com/bitnami-labs/udig "$T" && cd "$T"; go install ./cmd/udiglink; rm -rf "$T")
+```
+
+## Client usage
+
+Shell 1:
+```
+udiglink -alsologtostderr -addr uplink.udig.io:4000 -ingress-port 443 -egress localhost:8080
+```
+
+Shell 2:
+```
+python3 -m http.server 8080
+```
+
+Shell 3:
+```
+curl -k https://bahwqcerazdp76ea6rpuwvbbwxkjtypdntmw4bohi6amkzkfz2kswpxlpgykq.udig.io/README.md
+```
+
+(use the actual hostname you get in `tunnel ingress addresses: ["bahw....` in Shell 1 for ^^^)
+
+## Run locally
 
 Shell 1:
 ```
