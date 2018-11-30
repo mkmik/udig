@@ -47,7 +47,7 @@ local kube = import 'kube.libsonnet';
             },
 
             udigd: kube.Container('udigd') {
-              image: 'mkmik/udigd@sha256:c6defa796ac5c0cee08341cc2dee67b8bf7c8f404269b10d9dca2cdecbae60bd',
+              image: 'mkmik/udigd@sha256:07d8f611cead55f276543327c1c4cbface8e638043fa013882f9a7445e9ec0ce',
               args: [
                 '-logtostderr',
                 '-http',
@@ -57,9 +57,9 @@ local kube = import 'kube.libsonnet';
                 ':4000',
 
                 '-port',
-                '5353',
+                '53',
                 '-port',
-                '8443',
+                '443',
 
                 '-cert',
                 '/certs/tls.crt',
@@ -73,8 +73,8 @@ local kube = import 'kube.libsonnet';
               },
               ports_+: {
                 uplink: { containerPort: 4000 },
-                dns: { containerPort: 5353 },
-                https: { containerPort: 8443 },
+                dns: { containerPort: 53 },
+                https: { containerPort: 443 },
               },
               volumeMounts_+: {
                 certs: {
