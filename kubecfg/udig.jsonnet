@@ -68,6 +68,7 @@ local kube = import 'kube.libsonnet';
               ],
               securityContext: {
                 capabilities: {
+                  drop: ['all'],
                   add: ['NET_BIND_SERVICE'],
                 },
               },
