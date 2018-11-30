@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 	"time"
 
 	// registers debug handlers
@@ -16,7 +18,6 @@ import (
 
 	"github.com/bitnami-labs/promhttpmux"
 	"github.com/bitnami-labs/udig/pkg/egress"
-	"github.com/bitnami-labs/udig/pkg/ingress"
 	"github.com/bitnami-labs/udig/pkg/tunnel/tunnelpb"
 	"github.com/bitnami-labs/udig/pkg/uplink"
 	"github.com/bitnami-labs/udig/pkg/uplink/uplinkpb"
@@ -40,10 +41,9 @@ import (
 var (
 	laddr = flag.String("http", "", "listen address for http server (for debug, metrics)")
 	taddr = flag.String("addr", "uplink.udig.io:4000", "tunnel broker address")
-	eaddr = flag.String("egress", "", "egress host:port")
+	maps  = stringlist.Flag("R", "remote_port:local_host:local_port; comma separated or repeated flag")
 
-	ingressPorts = stringlist.Flag("ingress-port", "requested ingress port(s); comma separated or repeated flag)")
-	keyPairFile  = flag.String("keypair", filepath.Join(configDir, "keypair.json"), "Keypair file")
+	keyPairFile = flag.String("keypair", filepath.Join(configDir, "keypair.json"), "Keypair file")
 )
 
 const (
@@ -220,6 +220,27 @@ func run(laddr, taddr, eaddr string, ingressPorts []int32, keyPairFile string) e
 	return errors.Trace(listen(reg, laddr))
 }
 
+// parses a slice of remote_port:local_host:local_port.
+// for now we support only one egress
+func parsePortMaps(portMaps []string) (ports []int32, egress string, err error) {
+	for _, s := range portMaps {
+		c := strings.SplitN(s, ":", 2)
+
+		i, err := strconv.Atoi(c[0])
+		if err != nil {
+			return nil, "", errors.Trace(err)
+		}
+
+		if egress != "" && c[1] != egress {
+			return nil, "", errors.Errorf("we currently support only one egress, found %q and %q", egress, c[1])
+		}
+		egress = c[1]
+
+		ports = append(ports, int32(i))
+	}
+	return ports, egress, err
+}
+
 func main() {
 	flag.Parse()
 	defer glog.Flush()
@@ -228,11 +249,11 @@ func main() {
 		glog.Exitf("missing mandatory -addr")
 	}
 
-	if *eaddr == "" {
-		glog.Exitf("missing mandatory -egress")
+	if len(*maps) == 0 {
+		glog.Exitf("requiring least one -R")
 	}
 
-	ingressPortNums, err := ingress.ParsePorts(*ingressPorts)
+	ingressPortNums, eaddr, err := parsePortMaps(*maps)
 	if err != nil {
 		glog.Exitf("%v", err)
 	}
@@ -242,7 +263,7 @@ func main() {
 		glog.Fatalf("%+v", err)
 	}
 
-	if err := run(*laddr, *taddr, *eaddr, ingressPortNums, keyPairFile); err != nil {
+	if err := run(*laddr, *taddr, eaddr, ingressPortNums, keyPairFile); err != nil {
 		glog.Fatalf("%+v", err)
 	}
 }
