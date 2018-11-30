@@ -52,15 +52,15 @@ local kube = import 'kube.libsonnet';
                 '-logtostderr',
                 '-http',
                 ':8080',  // debug, metrics
-                
+
                 '-uplink',
                 ':4000',
-                
+
                 '-port',
                 '5353',
                 '-port',
                 '8443',
-                
+
                 '-cert',
                 '/certs/tls.crt',
                 '-key',
