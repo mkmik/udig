@@ -66,6 +66,11 @@ local kube = import 'kube.libsonnet';
                 '-key',
                 '/certs/tls.key',
               ],
+              securityContext: {
+                capabilities: {
+                  add: ['NET_BIND_SERVICE'],
+                },
+              },
               ports_+: {
                 uplink: { containerPort: 4000 },
                 dns: { containerPort: 5353 },
