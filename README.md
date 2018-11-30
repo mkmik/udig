@@ -41,41 +41,43 @@ Install by running this:
 
 Shell 1:
 ```
-udiglink -alsologtostderr -addr uplink.udig.io:4000 -ingress-port 443 -egress localhost:8080
+$ udiglink -addr uplink.udig.io:4000 -ingress-port 443 -egress localhost:8080
+bahwqcerazdp76ea6rpuwvbbwxkjtypdntmw4bohi6amkzkfz2kswpxlpgykq:443
 ```
 
 Shell 2:
 ```
-python3 -m http.server 8080
+$ python3 -m http.server 8080
+Serving HTTP on 0.0.0.0 port 8080 (http://0.0.0.0:8080/) ...
 ```
 
 Shell 3:
 ```
-curl -k https://bahwqcerazdp76ea6rpuwvbbwxkjtypdntmw4bohi6amkzkfz2kswpxlpgykq.udig.io/README.md
+$ curl -k https://bahwqcerazdp76ea6rpuwvbbwxkjtypdntmw4bohi6amkzkfz2kswpxlpgykq.udig.io/README.md
+# udig
+...
 ```
-
-(use the actual hostname you get in `tunnel ingress addresses: ["bahw....` in Shell 1 for ^^^)
 
 ## Run locally
 
 Shell 1:
 ```
-(cd cmd/udiglink && go build && ./udiglink -alsologtostderr -addr localhost:4000 -http :8081 -ingress-port 8443 -egress localhost:1234)
+$ (cd cmd/udiglink && go build && ./udiglink -alsologtostderr -addr localhost:4000 -http :8081 -ingress-port 8443 -egress localhost:1234)
 ```
 
 Shell 2:
 ```
-(cd cmd/udigd && go build && ./udigd -alsologtostderr -http :8001  -port 8080 -port 8443 -cert ../../pkg/ingress/testdata/cert.pem -key ../../pkg/ingress/testdata/key.pem)
+$ (cd cmd/udigd && go build && ./udigd -alsologtostderr -http :8001  -port 8080 -port 8443 -cert ../../pkg/ingress/testdata/cert.pem -key ../../pkg/ingress/testdata/key.pem)
 ```
 
 Shell 3:
 ```
-python3 -m http.server 1234
+$ python3 -m http.server 1234
 ```
 
 Shell 4:
 ```
-curl  --connect-to ::127.0.0.1:8443 -k https://bahwqcerazdp76ea6rpuwvbbwxkjtypdntmw4bohi6amkzkfz2kswpxlpgykq.udig.io/README.md
+$ curl  --connect-to ::127.0.0.1:8443 -k https://bahwqcerazdp76ea6rpuwvbbwxkjtypdntmw4bohi6amkzkfz2kswpxlpgykq.udig.io/README.md
 ```
 
 (use the actual hostname you get in `tunnel ingress addresses: ["bahw....` in Shell 1 for ^^^)
