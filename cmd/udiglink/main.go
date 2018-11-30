@@ -39,7 +39,7 @@ import (
 
 var (
 	laddr = flag.String("http", "", "listen address for http server (for debug, metrics)")
-	taddr = flag.String("addr", "", "tunnel broker address")
+	taddr = flag.String("addr", "uplink.udig.io:4000", "tunnel broker address")
 	eaddr = flag.String("egress", "", "egress host:port")
 
 	ingressPorts = stringlist.Flag("ingress-port", "requested ingress port(s); comma separated or repeated flag)")
