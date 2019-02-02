@@ -11,6 +11,9 @@ services:
 env:
   - GO111MODULE=on
 
+install:
+  - echo vendored deps
+
 script:
   - go build -mod=vendor ./...
   - go test -v -mod=vendor ./...
