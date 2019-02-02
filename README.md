@@ -30,11 +30,8 @@ Tunnel ingress addresses look like this: bahwqcerazdp76ea6rpuwvbbwxkjtypdntmw4bo
 
 ## Install
 
-This project uses the experimental Go modules support. You need Go >1.11.
-Install by running this:
-
 ```
-(T=$(mktemp); rm -rf "$T"; git clone https://github.com/bitnami-labs/udig "$T" && cd "$T"; go install ./cmd/udiglink; rm -rf "$T")
+$ go get -u github.com/bitnami-labs/udig
 ```
 
 ## Client usage

@@ -5,11 +5,9 @@ FROM golang:${GO_VERSION} AS builder
 RUN apt-get update && apt-get install --yes libcap2-bin
 
 WORKDIR /src
-COPY ./go.mod ./go.sum ./
-RUN go mod download
 
 COPY ./ ./
-RUN go build -o /udig ./cmd/udigd
+RUN go build -mod=vendor -o /udig ./cmd/udigd
 
 RUN setcap 'cap_net_bind_service+eip' /udig
 
