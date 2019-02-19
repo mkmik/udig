@@ -31,7 +31,7 @@ Tunnel ingress addresses look like this: bahwqcerazdp76ea6rpuwvbbwxkjtypdntmw4bo
 ## Install
 
 ```
-$ go get -u github.com/bitnami-labs/udig
+$ go get -u github.com/bitnami-labs/udig/...
 ```
 
 ## Client usage
