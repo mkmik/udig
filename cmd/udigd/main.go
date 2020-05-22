@@ -23,7 +23,7 @@ import (
 	"github.com/hashicorp/yamux"
 	cid "github.com/ipfs/go-cid"
 	"github.com/juju/errors"
-	"github.com/mmikulicic/stringlist"
+	"github.com/mkmik/stringlist"
 	multibase "github.com/multiformats/go-multibase"
 	"github.com/multiformats/go-multihash"
 	"github.com/prometheus/client_golang/prometheus/promhttp"

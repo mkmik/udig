@@ -29,7 +29,7 @@ import (
 	"github.com/hashicorp/yamux"
 	"github.com/juju/errors"
 	"github.com/mitchellh/go-homedir"
-	"github.com/mmikulicic/stringlist"
+	"github.com/mkmik/stringlist"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	forwarded "github.com/stanvit/go-forwarded"
 	"golang.org/x/crypto/ed25519"

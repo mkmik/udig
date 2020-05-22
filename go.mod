@@ -14,7 +14,7 @@ require (
 	github.com/juju/errors v0.0.0-20181118221551-089d3ea4e4d5
 	github.com/juju/testing v0.0.0-20200510222523-6c8c298c77a0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/mmikulicic/stringlist v0.0.0-20170411212101-a0d1ef9a7ccb
+	github.com/mkmik/stringlist v1.0.1
 	github.com/multiformats/go-multibase v0.0.2
 	github.com/multiformats/go-multihash v0.0.13
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
