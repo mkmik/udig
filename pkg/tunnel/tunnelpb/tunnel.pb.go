@@ -8,6 +8,8 @@ import (
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -20,7 +22,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type Up struct {
 	// This **must** be set on the first `Request` of each `Ingress()` action.
@@ -318,6 +320,14 @@ func (x *tunnelNewStreamClient) Recv() (*Down, error) {
 // TunnelServer is the server API for Tunnel service.
 type TunnelServer interface {
 	NewStream(Tunnel_NewStreamServer) error
+}
+
+// UnimplementedTunnelServer can be embedded to have forward compatible implementations.
+type UnimplementedTunnelServer struct {
+}
+
+func (*UnimplementedTunnelServer) NewStream(srv Tunnel_NewStreamServer) error {
+	return status.Errorf(codes.Unimplemented, "method NewStream not implemented")
 }
 
 func RegisterTunnelServer(s *grpc.Server, srv TunnelServer) {

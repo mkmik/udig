@@ -9,6 +9,8 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	status "google.golang.org/genproto/googleapis/rpc/status"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status1 "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -21,7 +23,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type RegisterTrigger struct {
 	Nonce                []byte   `protobuf:"bytes,1,opt,name=nonce,proto3" json:"nonce,omitempty"`
@@ -213,97 +215,13 @@ func (m *SetupRequest) GetError() *status.Status {
 	return nil
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*SetupRequest) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _SetupRequest_OneofMarshaler, _SetupRequest_OneofUnmarshaler, _SetupRequest_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*SetupRequest) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*SetupRequest_Ingress_)(nil),
 		(*SetupRequest_Redirect_)(nil),
 		(*SetupRequest_Error)(nil),
 	}
-}
-
-func _SetupRequest_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*SetupRequest)
-	// setup
-	switch x := m.Setup.(type) {
-	case *SetupRequest_Ingress_:
-		b.EncodeVarint(1<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Ingress); err != nil {
-			return err
-		}
-	case *SetupRequest_Redirect_:
-		b.EncodeVarint(2<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Redirect); err != nil {
-			return err
-		}
-	case *SetupRequest_Error:
-		b.EncodeVarint(3<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.Error); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("SetupRequest.Setup has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _SetupRequest_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*SetupRequest)
-	switch tag {
-	case 1: // setup.ingress
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(SetupRequest_Ingress)
-		err := b.DecodeMessage(msg)
-		m.Setup = &SetupRequest_Ingress_{msg}
-		return true, err
-	case 2: // setup.redirect
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(SetupRequest_Redirect)
-		err := b.DecodeMessage(msg)
-		m.Setup = &SetupRequest_Redirect_{msg}
-		return true, err
-	case 3: // setup.error
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(status.Status)
-		err := b.DecodeMessage(msg)
-		m.Setup = &SetupRequest_Error{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _SetupRequest_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*SetupRequest)
-	// setup
-	switch x := m.Setup.(type) {
-	case *SetupRequest_Ingress_:
-		s := proto.Size(x.Ingress)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *SetupRequest_Redirect_:
-		s := proto.Size(x.Redirect)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *SetupRequest_Error:
-		s := proto.Size(x.Error)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 type SetupRequest_Ingress struct {
@@ -504,6 +422,17 @@ func (c *uplinkClient) Setup(ctx context.Context, in *SetupRequest, opts ...grpc
 type UplinkServer interface {
 	Register(context.Context, *RegisterTrigger) (*RegisterRequest, error)
 	Setup(context.Context, *SetupRequest) (*SetupResponse, error)
+}
+
+// UnimplementedUplinkServer can be embedded to have forward compatible implementations.
+type UnimplementedUplinkServer struct {
+}
+
+func (*UnimplementedUplinkServer) Register(ctx context.Context, req *RegisterTrigger) (*RegisterRequest, error) {
+	return nil, status1.Errorf(codes.Unimplemented, "method Register not implemented")
+}
+func (*UnimplementedUplinkServer) Setup(ctx context.Context, req *SetupRequest) (*SetupResponse, error) {
+	return nil, status1.Errorf(codes.Unimplemented, "method Setup not implemented")
 }
 
 func RegisterUplinkServer(s *grpc.Server, srv UplinkServer) {
