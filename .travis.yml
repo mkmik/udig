@@ -1,6 +1,6 @@
 language: go
 go:
-  - "1.11.x"
+  - "1.14.x"
 
 os:
   - linux
@@ -11,12 +11,8 @@ services:
 env:
   - GO111MODULE=on
 
-install:
-  - echo vendored deps
-
 script:
-  - go build -mod=vendor ./...
-  - go test -v -mod=vendor ./...
+  - go test -v ./...
   - docker build -f Dockerfile-udigd -t mkmik/udigd .
 
 deploy:

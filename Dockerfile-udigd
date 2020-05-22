@@ -1,4 +1,4 @@
-ARG GO_VERSION=1.11.2
+ARG GO_VERSION=1.14.3
 
 FROM golang:${GO_VERSION} AS builder
 
@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install --yes libcap2-bin
 WORKDIR /src
 
 COPY ./ ./
-RUN go build -mod=vendor -o /udig ./cmd/udigd
+RUN go build  -o /udig ./cmd/udigd
 
 RUN setcap 'cap_net_bind_service+eip' /udig
 
