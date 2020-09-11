@@ -87,7 +87,7 @@ local kube = import 'kube.libsonnet';
               },
             },
           },
-          volumes_: +{
+          volumes_+: {
             certs: {
               secret: { secretName: 'udig' },
             },
