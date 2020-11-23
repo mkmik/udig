@@ -8,8 +8,8 @@ on:
 
 jobs:
 
-  build:
-    name: Build
+  test:
+    name: Test
     runs-on: ubuntu-latest
     steps:
 
@@ -24,3 +24,12 @@ jobs:
 
     - name: Test
       run: go test -v ./...
+
+  build:
+    name: Build
+    runs-on: ubuntu-latestt
+    steps:
+      - name: Docker
+        uses: docker/build-push-action@v2.2.0
+        with:
+          file: Dockerfile-udigd
