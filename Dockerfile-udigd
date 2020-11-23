@@ -18,7 +18,7 @@ COPY --from=builder /udig /udig
 
 COPY --from=builder /sbin/getcap /sbin
 COPY --from=builder /sbin/setcap /sbin
-COPY --from=builder /lib/x86_64-linux-gnu/libcap.so.2 /lib
+COPY --from=builder /lib/*-linux-gnu/libcap.so.2 /lib
 
 RUN ["/sbin/setcap", "cap_net_bind_service=+ep", "/udig"]
 
