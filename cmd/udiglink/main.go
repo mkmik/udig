@@ -27,7 +27,6 @@ import (
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/hashicorp/yamux"
-	"github.com/mitchellh/go-homedir"
 	"github.com/mkmik/stringlist"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	forwarded "github.com/stanvit/go-forwarded"
@@ -42,12 +41,18 @@ var (
 	taddr = flag.String("addr", "uplink.udig.io:4000", "tunnel broker address")
 	maps  = stringlist.Flag("R", "remote_port:local_host:local_port; comma separated or repeated flag")
 
-	keyPairFile = flag.String("keypair", filepath.Join(configDir, "keypair.json"), "Keypair file")
+	keyPairFile = flag.String("keypair", filepath.Join(defaultConfigDir, "keypair.json"), "Keypair file")
+
+	defaultConfigDir = getDefaultConfigDir()
 )
 
-const (
-	configDir = "~/.config/udiglink"
-)
+func getDefaultConfigDir() string {
+	h, err := os.UserHomeDir()
+	if err != nil {
+		panic(err)
+	}
+	return filepath.Join(h, ".config/udiglink")
+}
 
 // KeyPair is a ed25519 key pair JSON struct.
 type KeyPair struct {
@@ -265,12 +270,7 @@ func main() {
 		glog.Exitf("%v", err)
 	}
 
-	keyPairFile, err := homedir.Expand(*keyPairFile)
-	if err != nil {
-		glog.Fatalf("%+v", err)
-	}
-
-	if err := run(*laddr, *taddr, eaddr, ingressPortNums, keyPairFile); err != nil {
+	if err := run(*laddr, *taddr, eaddr, ingressPortNums, *keyPairFile); err != nil {
 		glog.Fatalf("%+v", err)
 	}
 }
