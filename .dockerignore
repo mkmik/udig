@@ -1,2 +1,4 @@
 .git
 Dockerfile-udigd
+kubecfg/
+doc/

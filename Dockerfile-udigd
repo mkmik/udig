@@ -1,13 +1,18 @@
+# syntax = docker/dockerfile:1-experimental
+
 ARG GO_VERSION=1.15.4
 
 FROM golang:${GO_VERSION} AS builder
 
-RUN apt-get update && apt-get install --yes libcap2-bin
-
 WORKDIR /src
+ENV CGO_ENABLED=0
+COPY go.* .
+RUN --mount=type=cache,target=/go/pkg    go mod download -x
 
 COPY ./ ./
-RUN go build  -o /udig ./cmd/udigd
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=cache,target=/go/pkg \
+    go build  -o /udig ./cmd/udigd
 
 RUN setcap 'cap_net_bind_service+eip' /udig
 
