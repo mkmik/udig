@@ -19,10 +19,9 @@ import (
 	"github.com/bitnami-labs/udig/pkg/uplink"
 	"github.com/bitnami-labs/udig/pkg/uplink/uplinkpb"
 	"github.com/golang/glog"
-	"github.com/grpc-ecosystem/go-grpc-prometheus"
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/hashicorp/yamux"
 	cid "github.com/ipfs/go-cid"
-	"github.com/juju/errors"
 	"github.com/mkmik/stringlist"
 	multibase "github.com/multiformats/go-multibase"
 	"github.com/multiformats/go-multihash"
@@ -57,14 +56,14 @@ func handleUplink(ctx context.Context, conn *grpc.ClientConn, domain string, ena
 
 	nonce := make([]byte, 64)
 	if _, err := rand.Read(nonce[:]); err != nil {
-		return errors.Trace(err)
+		return err
 	}
 
 	req, err := up.Register(ctx, &uplinkpb.RegisterTrigger{
 		Nonce: nonce,
 	})
 	if err != nil {
-		return errors.Trace(err)
+		return err
 	}
 	glog.V(2).Infof("got uplink request: %s", req)
 
@@ -85,13 +84,13 @@ func handleUplink(ctx context.Context, conn *grpc.ClientConn, domain string, ena
 	}()
 
 	if ok := ed25519.Verify(ed25519.PublicKey(req.Ed25519PublicKey), nonce, req.Signature); !ok {
-		return errors.Errorf("bad signature")
+		return fmt.Errorf("bad signature")
 	}
 	glog.V(2).Infof("signature ok")
 
 	tid, err := mkTunnelID(req.Ed25519PublicKey)
 	if err != nil {
-		return errors.Trace(err)
+		return err
 	}
 	glog.Infof("setting up uplink for tunnel %s", tid)
 
@@ -108,7 +107,7 @@ func handleUplink(ctx context.Context, conn *grpc.ClientConn, domain string, ena
 		},
 	})
 	if err != nil {
-		return errors.Trace(err)
+		return err
 	}
 
 	changeUplink <- uplink.Change{
@@ -146,7 +145,7 @@ func effectivePorts(requestedPorts, enabledPorts []int32) []int32 {
 func mkTunnelID(publicKey []byte) (string, error) {
 	mh, err := multihash.Sum(publicKey, multihash.SHA2_256, -1)
 	if err != nil {
-		return "", errors.Trace(err)
+		return "", err
 	}
 	c := cid.NewCidV1(Ed25519Pub, mh)
 	return c.Encode(multibase.MustNewEncoder(multibase.Base32)), nil
@@ -156,11 +155,11 @@ func randomUplinkID() (string, error) {
 	id := make([]byte, 32)
 	_, err := rand.Read(id)
 	if err != nil {
-		return "", errors.Trace(err)
+		return "", err
 	}
 	mh, err := multihash.Sum(id, multihash.SHA2_256, -1)
 	if err != nil {
-		return "", errors.Trace(err)
+		return "", err
 	}
 	c := cid.NewCidV1(cid.Raw, mh)
 	return c.Encode(multibase.MustNewEncoder(multibase.Base32)), nil
@@ -227,7 +226,7 @@ func listenHTTP(haddr string) error {
 	mux.Handle("/metrics", promhttp.Handler())
 	clientIPWrapper, _ := forwarded.New("0.0.0.0/0", false, false, "X-Forwarded-For", "X-Forwarded-Protocol")
 
-	return errors.Trace(http.ListenAndServe(haddr, clientIPWrapper.Handler(promhttpmux.Instrument(mux))))
+	return http.ListenAndServe(haddr, clientIPWrapper.Handler(promhttpmux.Instrument(mux)))
 }
 
 func run(uaddr, haddr, domain string, ports []int32, certPath, keyPath string) error {
@@ -237,7 +236,7 @@ func run(uaddr, haddr, domain string, ports []int32, certPath, keyPath string) e
 
 	cert, err := tls.LoadX509KeyPair(certPath, keyPath)
 	if err != nil {
-		return errors.Trace(err)
+		return err
 	}
 
 	mux := uplink.NewInProcessRouter()
@@ -247,7 +246,7 @@ func run(uaddr, haddr, domain string, ports []int32, certPath, keyPath string) e
 		go ingress.Listen(p, cert, mux.Ingress())
 	}
 
-	return errors.Trace(listenHTTP(haddr))
+	return listenHTTP(haddr)
 }
 
 func main() {

@@ -11,8 +11,6 @@ require (
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/hashicorp/yamux v0.0.0-20190923154419-df201c70410d
 	github.com/ipfs/go-cid v0.0.5
-	github.com/juju/errors v0.0.0-20181118221551-089d3ea4e4d5
-	github.com/juju/testing v0.0.0-20200510222523-6c8c298c77a0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mkmik/stringlist v1.0.1
 	github.com/multiformats/go-multibase v0.0.2

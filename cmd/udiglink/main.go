@@ -27,7 +27,6 @@ import (
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/hashicorp/yamux"
-	"github.com/juju/errors"
 	"github.com/mitchellh/go-homedir"
 	"github.com/mkmik/stringlist"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -91,7 +90,7 @@ func serve(reg registerGRPC, conn net.Listener) error {
 	reg(gs)
 
 	glog.Infof("serving gRPC on on %q", conn.Addr())
-	return errors.Trace(gs.Serve(conn))
+	return gs.Serve(conn)
 }
 
 // keepDialing retries connecting when the connection fails
@@ -109,7 +108,7 @@ func keepDialing(reg registerGRPC, taddr string) {
 func dial(reg registerGRPC, taddr string) error {
 	conn, err := net.DialTimeout("tcp", taddr, time.Second*5)
 	if err != nil {
-		return errors.Annotatef(err, "error dialing: %s", taddr)
+		return fmt.Errorf("error dialing %q: %w", taddr, err)
 	}
 
 	grpcL, err := yamux.Server(conn, yamux.DefaultConfig())
@@ -117,7 +116,10 @@ func dial(reg registerGRPC, taddr string) error {
 		log.Fatalf("couldn't create yamux server: %s", err)
 	}
 
-	return errors.Trace(serve(reg, grpcL))
+	if err := serve(reg, grpcL); err != nil {
+		return fmt.Errorf("serve after dialing %q: %w", taddr, err)
+	}
+	return nil
 }
 
 // listen spawns a http server for debug (pprof, tracing, local debug uplink protocol)
@@ -130,7 +132,7 @@ func listen(reg registerGRPC, laddr string) error {
 
 	lis, err := net.Listen("tcp", laddr)
 	if err != nil {
-		return errors.Trace(err)
+		return err
 	}
 
 	m := cmux.New(lis)
@@ -146,7 +148,10 @@ func listen(reg registerGRPC, laddr string) error {
 	go serve(reg, grpcL)
 
 	// Serve the multiplexer and block
-	return errors.Trace(m.Serve())
+	if err := m.Serve(); err != nil {
+		return fmt.Errorf("serve after listening %q: %w", laddr, err)
+	}
+	return nil
 }
 
 func ensureKeypair(keyPairFile string) (ed25519.PublicKey, ed25519.PrivateKey, error) {
@@ -155,28 +160,28 @@ func ensureKeypair(keyPairFile string) (ed25519.PublicKey, ed25519.PrivateKey, e
 	if os.IsNotExist(err) {
 		pub, priv, err := ed25519.GenerateKey(nil)
 		if err != nil {
-			return nil, nil, errors.Trace(err)
+			return nil, nil, err
 		}
 		keypair.Public = pub
 		keypair.Private = priv
 
 		if err := os.MkdirAll(filepath.Dir(keyPairFile), 0700); err != nil {
-			return nil, nil, errors.Trace(err)
+			return nil, nil, err
 		}
 		f, err := os.Create(keyPairFile)
 		if err != nil {
-			return nil, nil, errors.Trace(err)
+			return nil, nil, err
 		}
 		defer f.Close()
 		if err := json.NewEncoder(f).Encode(&keypair); err != nil {
-			return nil, nil, errors.Trace(err)
+			return nil, nil, fmt.Errorf("encoding keypair %q: %w", keyPairFile, err)
 		}
 	} else if err != nil {
-		return nil, nil, errors.Trace(err)
+		return nil, nil, err
 	} else {
 		defer f.Close()
 		if err := json.NewDecoder(f).Decode(&keypair); err != nil {
-			return nil, nil, errors.Trace(err)
+			return nil, nil, fmt.Errorf("decoding keypair %q: %w", keyPairFile, err)
 		}
 	}
 	fmt.Fprintf(os.Stderr, "using key file: %s\n", keyPairFile)
@@ -190,7 +195,7 @@ func run(laddr, taddr, eaddr string, ingressPorts []int32, keyPairFile string) e
 
 	pub, priv, err := ensureKeypair(keyPairFile)
 	if err != nil {
-		return errors.Trace(err)
+		return err
 	}
 
 	sup := make(chan uplink.StatusUpdate)
@@ -204,12 +209,12 @@ func run(laddr, taddr, eaddr string, ingressPorts []int32, keyPairFile string) e
 
 	up, err := uplink.NewServer(ingressPorts, pub, priv, sup)
 	if err != nil {
-		return errors.Trace(err)
+		return err
 	}
 
 	eg, err := egress.NewServer(eaddr)
 	if err != nil {
-		return errors.Trace(err)
+		return err
 	}
 
 	reg := func(gs *grpc.Server) {
@@ -219,7 +224,7 @@ func run(laddr, taddr, eaddr string, ingressPorts []int32, keyPairFile string) e
 
 	go keepDialing(reg, taddr)
 
-	return errors.Trace(listen(reg, laddr))
+	return listen(reg, laddr)
 }
 
 // parses a slice of remote_port:local_host:local_port.
@@ -230,11 +235,11 @@ func parsePortMaps(portMaps []string) (ports []int32, egress string, err error) 
 
 		i, err := strconv.Atoi(c[0])
 		if err != nil {
-			return nil, "", errors.Trace(err)
+			return nil, "", fmt.Errorf("parsing port %q: %w", s, err)
 		}
 
 		if egress != "" && c[1] != egress {
-			return nil, "", errors.Errorf("we currently support only one egress, found %q and %q", egress, c[1])
+			return nil, "", fmt.Errorf("we currently support only one egress, found %q and %q", egress, c[1])
 		}
 		egress = c[1]
 

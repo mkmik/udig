@@ -2,12 +2,12 @@ package tunnel
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"net"
 
 	"github.com/bitnami-labs/udig/pkg/tunnel/tunnelpb"
 	"github.com/golang/glog"
-	"github.com/juju/errors"
 )
 
 const (
@@ -29,7 +29,7 @@ func HeaderFor(tunnelID string, conn net.Conn) *tunnelpb.Up_Header {
 func Siphon(ctx context.Context, tunnel tunnelpb.TunnelClient, header *tunnelpb.Up_Header, conn net.Conn) error {
 	s, err := tunnel.NewStream(ctx)
 	if err != nil {
-		return errors.Trace(err)
+		return fmt.Errorf("error siphoning: %w", err)
 	}
 
 	go func() {

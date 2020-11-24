@@ -8,7 +8,6 @@ import (
 
 	"github.com/bitnami-labs/udig/pkg/uplink"
 	"github.com/golang/glog"
-	"github.com/juju/errors"
 )
 
 var (
@@ -22,7 +21,7 @@ func ParsePorts(portStrings []string) ([]int32, error) {
 	for _, p := range portStrings {
 		i, err := strconv.Atoi(p)
 		if err != nil {
-			return nil, errors.Errorf("port number %q is not a number: %v", p, err)
+			return nil, fmt.Errorf("port number %q is not a number: %w", p, err)
 		}
 		res = append(res, int32(i))
 	}
