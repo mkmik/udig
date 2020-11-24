@@ -16,8 +16,7 @@ require (
 	github.com/multiformats/go-multibase v0.0.2
 	github.com/multiformats/go-multihash v0.0.13
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
-	github.com/prometheus/client_golang v1.6.0
-	github.com/prometheus/common v0.10.0 // indirect
+	github.com/prometheus/client_golang v1.8.0
 	github.com/stanvit/go-forwarded v0.0.0-20150905014133-9ab0287086b3
 	github.com/stretchr/testify v1.5.1 // indirect
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
