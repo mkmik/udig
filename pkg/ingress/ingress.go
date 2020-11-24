@@ -12,9 +12,11 @@ import (
 )
 
 var (
+	// DefaultPorts lists the default ingress ports.
 	DefaultPorts = []int32{443}
 )
 
+// ParsePorts parses a list port numbers and returns DefaultPorts if empty.
 func ParsePorts(portStrings []string) ([]int32, error) {
 	var res []int32
 	for _, p := range portStrings {
@@ -30,6 +32,9 @@ func ParsePorts(portStrings []string) ([]int32, error) {
 	return res, nil
 }
 
+// Listen listens to a port, and dispatches newly accepted connections to the forward channel.
+//
+// TLS termination is done here and the SNI name is passed to the uplink.NewStream structure.
 func Listen(port int32, cert tls.Certificate, forward chan<- uplink.NewStream) error {
 	glog.Infof("listening ingress on %d", port)
 

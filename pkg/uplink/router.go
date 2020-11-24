@@ -23,6 +23,7 @@ type Router interface {
 	Ingress() chan<- NewStream
 }
 
+// Change is a command that changes the tunnel configuratino (new endpoint, or remove endpoint).
 type Change struct {
 	TunnelID string
 	UplinkID string                // something unique about the uplink connection
@@ -36,6 +37,7 @@ type InProcessRouter struct {
 	m       map[string]map[string]tunnelpb.TunnelClient
 }
 
+// NewInProcessRouter creates an InProcessRouter.
 func NewInProcessRouter() *InProcessRouter {
 	r := &InProcessRouter{
 		ingress: make(chan NewStream),
@@ -47,8 +49,11 @@ func NewInProcessRouter() *InProcessRouter {
 	return r
 }
 
+// Ingress returns a channel with ingress requests.
 func (r *InProcessRouter) Ingress() chan<- NewStream { return r.ingress }
-func (r *InProcessRouter) Uplink() chan<- Change     { return r.uplink }
+
+// Uplink returns a channel of uplink changes.
+func (r *InProcessRouter) Uplink() chan<- Change { return r.uplink }
 
 func (r *InProcessRouter) run() {
 	for {

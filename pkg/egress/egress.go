@@ -10,10 +10,12 @@ import (
 	"github.com/golang/glog"
 )
 
+// Server is an egress tunnel server.
 type Server struct {
 	eaddr string
 }
 
+// NewServer creates an egress tunnel server.
 func NewServer(eaddr string) (*Server, error) {
 	return &Server{eaddr: eaddr}, nil
 }
@@ -24,6 +26,7 @@ type closeWriter interface {
 	CloseWrite() error
 }
 
+// NewStream implements the TunnelServer gRPC interface.
 func (eg *Server) NewStream(s tunnelpb.Tunnel_NewStreamServer) error {
 	cli, err := net.Dial("tcp", eg.eaddr)
 	if err != nil {

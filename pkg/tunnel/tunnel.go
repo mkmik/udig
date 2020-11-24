@@ -11,6 +11,7 @@ import (
 )
 
 const (
+	// DefaultDataFrameSize is the default data frame size.
 	DefaultDataFrameSize = 1024 * 16
 )
 
