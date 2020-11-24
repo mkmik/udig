@@ -50,7 +50,7 @@ Serving HTTP on 0.0.0.0 port 8080 (http://0.0.0.0:8080/) ...
 
 Shell 3:
 ```
-$ curl -k https://bahwqcerazdp76ea6rpuwvbbwxkjtypdntmw4bohi6amkzkfz2kswpxlpgykq.udig.io/README.md
+$ curl https://bahwqcerazdp76ea6rpuwvbbwxkjtypdntmw4bohi6amkzkfz2kswpxlpgykq.udig.io/README.md
 # udig
 ...
 ```
@@ -94,7 +94,7 @@ curl https://bahwqcerazdp76ea6rpuwvbbwxkjtypdntmw4bohi6amkzkfz2kswpxlpgykq.udig.
 
 ## Off-the-shelf tunnel client example
 
-Udig forces you to use a TLS client and one that suppoers SNI nonetheless!
+Udig forces you to use a TLS client and one that supports SNI nonetheless!
 If you have a plaintext TCP client on one side that needs to talk to a plaintext TCP  server on the other side of the tunnel, this is an example of how you can setup the client side of the tunnel with standard off the-shelf-tools:
 
 ```
