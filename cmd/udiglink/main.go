@@ -23,9 +23,9 @@ import (
 	"github.com/bitnami-labs/udig/pkg/uplink/uplinkpb"
 	"github.com/cockroachdb/cmux"
 	"github.com/golang/glog"
-	"github.com/grpc-ecosystem/go-grpc-middleware"
-	"github.com/grpc-ecosystem/go-grpc-middleware/recovery"
-	"github.com/grpc-ecosystem/go-grpc-prometheus"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/hashicorp/yamux"
 	"github.com/juju/errors"
 	"github.com/mitchellh/go-homedir"
@@ -50,6 +50,7 @@ const (
 	configDir = "~/.config/udiglink"
 )
 
+// KeyPair is a ed25519 key pair JSON struct.
 type KeyPair struct {
 	Public  ed25519.PublicKey  `json:"public"`
 	Private ed25519.PrivateKey `json:"private"`
