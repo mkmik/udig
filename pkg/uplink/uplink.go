@@ -4,20 +4,18 @@ import (
 	"context"
 
 	"github.com/bitnami-labs/udig/pkg/uplink/uplinkpb"
-
 	"github.com/golang/glog"
 	"golang.org/x/crypto/ed25519"
 )
 
 // Server is an uplink server.
 type Server struct {
+	uplinkpb.UnimplementedUplinkServer
 	privateKey ed25519.PrivateKey
 	PublicKey  ed25519.PublicKey
 	Ports      []int32
 	sup        chan<- StatusUpdate
 }
-
-var _ uplinkpb.UplinkServer = (*Server)(nil)
 
 // StatusUpdate is used to report
 type StatusUpdate struct {

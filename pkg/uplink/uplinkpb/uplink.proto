@@ -2,7 +2,7 @@ syntax = "proto3";
 
 import "google/rpc/status.proto";
 
-option go_package = "uplinkpb";
+option go_package = "github.com/bitnami-labs/udig/pkg/uplink/uplinkpb";
 
 service Uplink {
   rpc Register(RegisterTrigger) returns (RegisterRequest);
@@ -36,7 +36,7 @@ message SetupRequest {
     // hostname:port pairs where the tunnel will be accessible to external clients.
     repeated string ingress = 1;
   }
-  
+
   message Redirect {
     // the tunnel request is accepted by this broker instance is not the right
     // endpoint the setup a durable tunnel session.
@@ -48,7 +48,7 @@ message SetupRequest {
   oneof setup {
      Ingress ingress = 1;
      Redirect redirect = 2;
- 
+
     // in case of any error setting up the tunnel, the server will send the
     // status here (because it cannot respond with an error to the RegisterResponse
     // response, because it's already a response).

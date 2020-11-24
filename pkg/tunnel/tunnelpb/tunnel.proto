@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "tunnelpb";
+option go_package = "github.com/bitnami-labs/udig/pkg/tunnel/tunnelpb";
 
 service Tunnel {
   rpc NewStream(stream Up) returns (stream Down);
@@ -11,7 +11,7 @@ message Up {
   // client hitting the ingress. This can be useful for logging or for a
   // second level virtual hosting if the broker supports wildcard DNS.
   message Header {
-    // <tunnel_id>.udig.io 
+    // <tunnel_id>.udig.io
     //     ^^^
     string tunnel_id = 1;
     string protocol = 2; // *must* be "TCP" for now.

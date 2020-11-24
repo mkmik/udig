@@ -12,6 +12,7 @@ import (
 
 // Server is an egress tunnel server.
 type Server struct {
+	tunnelpb.UnimplementedTunnelServer
 	eaddr string
 }
 
@@ -19,8 +20,6 @@ type Server struct {
 func NewServer(eaddr string) (*Server, error) {
 	return &Server{eaddr: eaddr}, nil
 }
-
-var _ tunnelpb.TunnelServer = (*Server)(nil)
 
 type closeWriter interface {
 	CloseWrite() error
