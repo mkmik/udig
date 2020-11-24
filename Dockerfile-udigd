@@ -17,7 +17,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 RUN setcap 'cap_net_bind_service+eip' /udig
 
 # distroless with busybox
-FROM gcr.io/distroless/base@sha256:ca60828b628c3032b2e79bb8f20868ed5314ec5b8a9272523a9d74cfba18192b
+FROM gcr.io/distroless/base@sha256:44cbdb9c24e123882d7894ba78fb6f572d2496889885a47eb4b32241a8c07a00
 
 COPY --from=builder /udig /udig
 
