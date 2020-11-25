@@ -47,7 +47,7 @@ local kube = import 'kube.libsonnet';
             },
 
             udigd: kube.Container('udigd') {
-              image: 'mkmik/udigd@sha256:fbd1dca7fdbc2feb473f568cf064555073c2eb26064c43ac16cdd1f5ae04b394',
+              image: 'mkmik/udigd@sha256:b95419023911efc9595919aa7ea42d33fa3060aa73da0cc69525a7b5ef5f8a55',
               args: [
                 '-logtostderr',
                 '-http',
