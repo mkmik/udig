@@ -1,4 +1,4 @@
-module github.com/bitnami-labs/udig
+module github.com/mkmik/udig
 
 go 1.14
 

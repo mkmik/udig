@@ -3,7 +3,7 @@ package uplink
 import (
 	"context"
 
-	"github.com/bitnami-labs/udig/pkg/uplink/uplinkpb"
+	"github.com/mkmik/udig/pkg/uplink/uplinkpb"
 	"github.com/golang/glog"
 	"golang.org/x/crypto/ed25519"
 )

@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/bitnami-labs/udig/pkg/uplink"
+	"github.com/mkmik/udig/pkg/uplink"
 	"github.com/golang/glog"
 )
 

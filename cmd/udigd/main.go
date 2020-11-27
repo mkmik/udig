@@ -1,4 +1,4 @@
-package main // imports "github.com/bitnami-labs/udig/cmd/udigd"
+package main // imports "github.com/mkmik/udig/cmd/udigd"
 
 import (
 	"context"
@@ -14,10 +14,10 @@ import (
 	_ "net/http/pprof"
 
 	"github.com/bitnami-labs/promhttpmux"
-	"github.com/bitnami-labs/udig/pkg/ingress"
-	"github.com/bitnami-labs/udig/pkg/tunnel/tunnelpb"
-	"github.com/bitnami-labs/udig/pkg/uplink"
-	"github.com/bitnami-labs/udig/pkg/uplink/uplinkpb"
+	"github.com/mkmik/udig/pkg/ingress"
+	"github.com/mkmik/udig/pkg/tunnel/tunnelpb"
+	"github.com/mkmik/udig/pkg/uplink"
+	"github.com/mkmik/udig/pkg/uplink/uplinkpb"
 	"github.com/golang/glog"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/hashicorp/yamux"

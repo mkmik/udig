@@ -4,8 +4,8 @@ import (
 	"context"
 	"net"
 
-	"github.com/bitnami-labs/udig/pkg/tunnel"
-	"github.com/bitnami-labs/udig/pkg/tunnel/tunnelpb"
+	"github.com/mkmik/udig/pkg/tunnel"
+	"github.com/mkmik/udig/pkg/tunnel/tunnelpb"
 	"github.com/golang/glog"
 )
 

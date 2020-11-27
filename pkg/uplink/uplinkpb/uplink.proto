@@ -2,7 +2,7 @@ syntax = "proto3";
 
 import "google/rpc/status.proto";
 
-option go_package = "github.com/bitnami-labs/udig/pkg/uplink/uplinkpb";
+option go_package = "github.com/mkmik/udig/pkg/uplink/uplinkpb";
 
 service Uplink {
   rpc Register(RegisterTrigger) returns (RegisterRequest);

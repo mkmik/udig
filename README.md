@@ -1,7 +1,7 @@
 # udig
 
 [![Build Status](https://img.shields.io/github/workflow/status/mkmik/udig/CI)](https://github.com/mkmik/udig/actions)
-[![Go Report Card](https://goreportcard.com/badge/github.com/bitnami-labs/udig)](https://goreportcard.com/report/github.com/bitnami-labs/udig)
+[![Go Report Card](https://goreportcard.com/badge/github.com/mkmik/udig)](https://goreportcard.com/report/github.com/mkmik/udig)
 
 udig is a public-key addressed TCP tunnel software. It allows anybody to expose a local network
 service through a public stable ingress, even if the local service is behind a NAT or firewall.
@@ -16,7 +16,7 @@ udig is suitable for automation because users don't need to create any account.
 
 ## How it works
 
-![architecture](https://github.com/bitnami-labs/udig/blob/master/doc/arch.png?raw=true)
+![architecture](https://github.com/mkmik/udig/blob/master/doc/arch.png?raw=true)
 
 It has of two logical endpoints:
 
@@ -31,7 +31,7 @@ Tunnel ingress addresses look like this: bahwqcerazdp76ea6rpuwvbbwxkjtypdntmw4bo
 ## Install
 
 ```
-$ go get -u github.com/bitnami-labs/udig/...
+$ go get -u github.com/mkmik/udig/...
 ```
 
 ## Client usage

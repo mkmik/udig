@@ -6,7 +6,7 @@ import (
 	"io"
 	"net"
 
-	"github.com/bitnami-labs/udig/pkg/tunnel/tunnelpb"
+	"github.com/mkmik/udig/pkg/tunnel/tunnelpb"
 	"github.com/golang/glog"
 )
 
