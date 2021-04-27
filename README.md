@@ -39,7 +39,7 @@ $ go get -u github.com/mkmik/udig/...
 Shell 1:
 ```
 $ udiglink -R 443:localhost:8080
-bahwqcerazdp76ea6rpuwvbbwxkjtypdntmw4bohi6amkzkfz2kswpxlpgykq:443
+https://bahwqcerazdp76ea6rpuwvbbwxkjtypdntmw4bohi6amkzkfz2kswpxlpgykq
 ```
 
 Shell 2:
