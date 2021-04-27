@@ -17,10 +17,6 @@ import (
 	_ "net/http/pprof"
 
 	"github.com/bitnami-labs/promhttpmux"
-	"github.com/mkmik/udig/pkg/egress"
-	"github.com/mkmik/udig/pkg/tunnel/tunnelpb"
-	"github.com/mkmik/udig/pkg/uplink"
-	"github.com/mkmik/udig/pkg/uplink/uplinkpb"
 	"github.com/cockroachdb/cmux"
 	"github.com/golang/glog"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
@@ -28,6 +24,10 @@ import (
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/hashicorp/yamux"
 	"github.com/mkmik/stringlist"
+	"github.com/mkmik/udig/pkg/egress"
+	"github.com/mkmik/udig/pkg/tunnel/tunnelpb"
+	"github.com/mkmik/udig/pkg/uplink"
+	"github.com/mkmik/udig/pkg/uplink/uplinkpb"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	forwarded "github.com/stanvit/go-forwarded"
 	"golang.org/x/crypto/ed25519"
@@ -207,7 +207,11 @@ func run(laddr, taddr, eaddr string, ingressPorts []int32, keyPairFile string) e
 	go func() {
 		for up := range sup {
 			for _, i := range up.Ingress {
-				fmt.Printf("%s\n", i)
+				if strings.HasSuffix(i, ":443") {
+					fmt.Printf("https://%s\n", strings.TrimSuffix(i, ":443"))
+				} else {
+					fmt.Printf("%s\n", i)
+				}
 			}
 		}
 	}()

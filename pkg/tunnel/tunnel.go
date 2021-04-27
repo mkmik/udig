@@ -6,8 +6,8 @@ import (
 	"io"
 	"net"
 
-	"github.com/mkmik/udig/pkg/tunnel/tunnelpb"
 	"github.com/golang/glog"
+	"github.com/mkmik/udig/pkg/tunnel/tunnelpb"
 )
 
 const (

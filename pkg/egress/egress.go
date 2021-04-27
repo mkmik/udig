@@ -5,9 +5,9 @@ import (
 	"io"
 	"net"
 
+	"github.com/golang/glog"
 	"github.com/mkmik/udig/pkg/tunnel"
 	"github.com/mkmik/udig/pkg/tunnel/tunnelpb"
-	"github.com/golang/glog"
 )
 
 // Server is an egress tunnel server.

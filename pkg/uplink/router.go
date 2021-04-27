@@ -4,9 +4,9 @@ import (
 	"context"
 	"net"
 
+	"github.com/golang/glog"
 	"github.com/mkmik/udig/pkg/tunnel"
 	"github.com/mkmik/udig/pkg/tunnel/tunnelpb"
-	"github.com/golang/glog"
 )
 
 // A NewStream struct encapsulates an intent to tunnel a new connection

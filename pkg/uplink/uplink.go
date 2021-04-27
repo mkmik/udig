@@ -3,8 +3,8 @@ package uplink
 import (
 	"context"
 
-	"github.com/mkmik/udig/pkg/uplink/uplinkpb"
 	"github.com/golang/glog"
+	"github.com/mkmik/udig/pkg/uplink/uplinkpb"
 	"golang.org/x/crypto/ed25519"
 )
 

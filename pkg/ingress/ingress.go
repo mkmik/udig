@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/mkmik/udig/pkg/uplink"
 	"github.com/golang/glog"
+	"github.com/mkmik/udig/pkg/uplink"
 )
 
 var (
