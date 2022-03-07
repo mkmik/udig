@@ -6,7 +6,7 @@ require (
 	github.com/bitnami-labs/promhttpmux v0.1.0
 	github.com/cockroachdb/cmux v0.0.0-20170110192607-30d10be49292
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
-	github.com/golang/protobuf v1.4.3
+	github.com/golang/protobuf v1.5.2
 	github.com/googleapis/googleapis v0.0.0-20181120215828-b7a1d68ea384 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.2
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
@@ -18,12 +18,11 @@ require (
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/prometheus/client_golang v1.8.0
 	github.com/stanvit/go-forwarded v0.0.0-20150905014133-9ab0287086b3
-	github.com/stretchr/testify v1.5.1 // indirect
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f
-	google.golang.org/genproto v0.0.0-20200806141610-86f49bd18e98
-	google.golang.org/grpc v1.33.2
+	google.golang.org/genproto v0.0.0-20220307174427-659dce7fcb03
+	google.golang.org/grpc v1.44.0
 	google.golang.org/grpc/examples v0.0.0-20201124195647-53c8623768ef // indirect
-	google.golang.org/protobuf v1.25.0
+	google.golang.org/protobuf v1.27.1
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 )
