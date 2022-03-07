@@ -1,0 +1,10 @@
+version = 1
+
+[approve]
+auto_approve_usernames = ["dependabot", "renovate"]
+
+[merge.automerge_dependencies]
+usernames = ["dependabot", "renovate"]
+
+[update]
+ignored_usernames = ["dependabot", "renovate"]
