@@ -14,7 +14,7 @@ require (
 	github.com/ipfs/go-cid v0.0.7
 	github.com/mkmik/stringlist v1.0.1
 	github.com/multiformats/go-multibase v0.0.3
-	github.com/multiformats/go-multihash v0.0.14
+	github.com/multiformats/go-multihash v0.1.0
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/prometheus/client_golang v1.8.0
 	github.com/stanvit/go-forwarded v0.0.0-20150905014133-9ab0287086b3
