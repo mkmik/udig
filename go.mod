@@ -5,7 +5,7 @@ go 1.14
 require (
 	github.com/bitnami-labs/promhttpmux v0.1.0
 	github.com/cockroachdb/cmux v0.0.0-20170110192607-30d10be49292
-	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
+	github.com/golang/glog v1.0.0
 	github.com/golang/protobuf v1.5.2
 	github.com/googleapis/googleapis v0.0.0-20181120215828-b7a1d68ea384 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.2
