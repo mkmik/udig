@@ -11,7 +11,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/hashicorp/yamux v0.0.0-20211028200310-0bc27b27de87
-	github.com/ipfs/go-cid v0.0.7
+	github.com/ipfs/go-cid v0.1.0
 	github.com/mkmik/stringlist v1.0.1
 	github.com/multiformats/go-multibase v0.0.3
 	github.com/multiformats/go-multihash v0.1.0
