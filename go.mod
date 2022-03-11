@@ -21,7 +21,7 @@ require (
 	golang.org/x/crypto v0.0.0-20220307211146-efcb8507fb70
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f
 	google.golang.org/genproto v0.0.0-20220310185008-1973136f34c6
-	google.golang.org/grpc v1.44.0
+	google.golang.org/grpc v1.45.0
 	google.golang.org/grpc/examples v0.0.0-20201124195647-53c8623768ef // indirect
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
