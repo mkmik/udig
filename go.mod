@@ -19,7 +19,7 @@ require (
 	github.com/prometheus/client_golang v1.12.1
 	github.com/stanvit/go-forwarded v0.0.0-20150905014133-9ab0287086b3
 	golang.org/x/crypto v0.0.0-20220321153916-2c7772ba3064
-	golang.org/x/net v0.0.0-20220225172249-27dd8689420f
+	golang.org/x/net v0.0.0-20220325170049-de3da57026de
 	google.golang.org/genproto v0.0.0-20220324131243-acbaeb5b85eb
 	google.golang.org/grpc v1.45.0
 	google.golang.org/grpc/examples v0.0.0-20201124195647-53c8623768ef // indirect
