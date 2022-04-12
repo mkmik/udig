@@ -18,7 +18,7 @@ require (
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/prometheus/client_golang v1.12.1
 	github.com/stanvit/go-forwarded v0.0.0-20150905014133-9ab0287086b3
-	golang.org/x/crypto v0.0.0-20220408190544-5352b0902921
+	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4
 	golang.org/x/net v0.0.0-20220407224826-aac1ed45d8e3
 	google.golang.org/genproto v0.0.0-20220329172620-7be39ac1afc7
 	google.golang.org/grpc v1.45.0
