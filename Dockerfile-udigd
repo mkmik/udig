@@ -1,8 +1,8 @@
 # syntax = docker/dockerfile:1-experimental
 
-ARG GO_VERSION=1.15.4
+ARG GO_VERSION=1.18
 
-FROM golang:${GO_VERSION} AS builder
+FROM golang:${GO_VERSION}-bullseye AS builder
 
 WORKDIR /src
 ENV CGO_ENABLED=0
@@ -14,6 +14,8 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
     go build  -o /udig ./cmd/udigd
 
+# is this still necessary?
+RUN apt-get update && apt-get install --yes libcap2-bin
 RUN setcap 'cap_net_bind_service+eip' /udig
 
 # distroless with busybox
