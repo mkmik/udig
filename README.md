@@ -16,7 +16,7 @@ udig is suitable for automation because users don't need to create any account.
 
 ## How it works
 
-![architecture](https://github.com/mkmik/udig/blob/master/doc/arch.png?raw=true)
+![architecture](doc/arch.png)
 
 It has of two logical endpoints:
 
