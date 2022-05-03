@@ -3,7 +3,7 @@ This project uses [kubecfg](https://github.com/ksonnet/kubecfg) to describe a pa
 In order to create your custom deployment create a .jsonnet file with something like this in it:
 
 ```
-(import "https://raw.githubusercontent.com/bitnami-labs/udig/master/kubecfg/udig.jsonnet") {
+(import "https://raw.githubusercontent.com/mkmik/udig/main/kubecfg/udig.jsonnet") {
   certificate+: {
     domainName:: 'yourdomain.io',
   },
