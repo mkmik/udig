@@ -16,4 +16,4 @@ Then apply it with:
 kubecfg update udig.jsonnet
 ```
 
-When you're happy with it we recommend you replace `master` with the current commit SHA of the udig repo.
+When you're happy with it we recommend you replace `main` with the current commit SHA of the udig repo.
