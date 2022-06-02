@@ -18,7 +18,7 @@ require (
 	github.com/stanvit/go-forwarded v0.0.0-20150905014133-9ab0287086b3
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e
 	golang.org/x/net v0.0.0-20220516133312-45b265872317
-	google.golang.org/genproto v0.0.0-20220601144221-27df5f98adab
+	google.golang.org/genproto v0.0.0-20220602131408-e326c6e8e9c8
 	google.golang.org/grpc v1.46.2
 	google.golang.org/protobuf v1.28.0
 )
