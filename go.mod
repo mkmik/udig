@@ -17,7 +17,7 @@ require (
 	github.com/prometheus/client_golang v1.12.2
 	github.com/stanvit/go-forwarded v0.0.0-20150905014133-9ab0287086b3
 	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
-	golang.org/x/net v0.0.0-20220516133312-45b265872317
+	golang.org/x/net v0.0.0-20220630215102-69896b714898
 	google.golang.org/genproto v0.0.0-20220630174209-ad1d48641aa7
 	google.golang.org/grpc v1.47.0
 	google.golang.org/protobuf v1.28.0
@@ -39,7 +39,7 @@ require (
 	github.com/prometheus/common v0.32.1 // indirect
 	github.com/prometheus/procfs v0.7.3 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
-	golang.org/x/sys v0.0.0-20220114195835-da31bd327af9 // indirect
+	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/grpc/examples v0.0.0-20201124195647-53c8623768ef // indirect
 	lukechampine.com/blake3 v1.1.6 // indirect
