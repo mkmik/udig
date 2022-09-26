@@ -16,7 +16,7 @@ require (
 	github.com/multiformats/go-multihash v0.2.1
 	github.com/prometheus/client_golang v1.13.0
 	github.com/stanvit/go-forwarded v0.0.0-20150905014133-9ab0287086b3
-	golang.org/x/crypto v0.0.0-20220924013350-4ba4fb4dd9e7
+	golang.org/x/crypto v0.0.0-20220926161630-eccd6366d1be
 	golang.org/x/net v0.0.0-20220909164309-bea034e7d591
 	google.golang.org/genproto v0.0.0-20220923205249-dd2d53f1fffc
 	google.golang.org/grpc v1.49.0
