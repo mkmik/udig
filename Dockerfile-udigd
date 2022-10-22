@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install --yes libcap2-bin
 RUN setcap 'cap_net_bind_service+eip' /udig
 
 # distroless with busybox
-FROM gcr.io/distroless/base@sha256:1247d3b7a3e9bf429a12208a3ff2f6631b8c24b4d13bca803477ec7dab750069
+FROM gcr.io/distroless/base@sha256:122585ba4c098993df9f8dc7285433e8a19974de32528ee3a4b07308808c84ce
 
 COPY --from=builder /udig /udig
 
