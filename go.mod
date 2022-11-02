@@ -14,7 +14,7 @@ require (
 	github.com/mkmik/stringlist v1.0.1
 	github.com/multiformats/go-multibase v0.1.1
 	github.com/multiformats/go-multihash v0.2.1
-	github.com/prometheus/client_golang v1.13.0
+	github.com/prometheus/client_golang v1.13.1
 	github.com/stanvit/go-forwarded v0.0.0-20150905014133-9ab0287086b3
 	golang.org/x/crypto v0.0.0-20221012134737-56aed061732a
 	golang.org/x/net v0.0.0-20221014081412-f15817d10f9b
