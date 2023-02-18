@@ -17,7 +17,7 @@ require (
 	github.com/prometheus/client_golang v1.14.0
 	github.com/stanvit/go-forwarded v0.0.0-20150905014133-9ab0287086b3
 	golang.org/x/crypto v0.1.0
-	golang.org/x/net v0.6.0
+	golang.org/x/net v0.7.0
 	google.golang.org/genproto v0.0.0-20230216225411-c8e22ba71e44
 	google.golang.org/grpc v1.53.0
 	google.golang.org/protobuf v1.28.1
@@ -33,7 +33,6 @@ require (
 	github.com/mr-tron/base58 v1.2.0 // indirect
 	github.com/multiformats/go-base32 v0.0.3 // indirect
 	github.com/multiformats/go-base36 v0.1.0 // indirect
-	github.com/multiformats/go-multicodec v0.5.0 // indirect
 	github.com/multiformats/go-varint v0.0.6 // indirect
 	github.com/prometheus/client_model v0.3.0 // indirect
 	github.com/prometheus/common v0.37.0 // indirect
