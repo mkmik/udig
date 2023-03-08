@@ -6,7 +6,7 @@ require (
 	github.com/bitnami-labs/promhttpmux v0.1.0
 	github.com/cockroachdb/cmux v0.0.0-20170110192607-30d10be49292
 	github.com/golang/glog v1.0.0
-	github.com/golang/protobuf v1.5.2
+	github.com/golang/protobuf v1.5.3
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/hashicorp/yamux v0.1.1
