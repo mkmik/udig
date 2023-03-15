@@ -12,7 +12,7 @@ require (
 	github.com/hashicorp/yamux v0.1.1
 	github.com/ipfs/go-cid v0.3.2
 	github.com/mkmik/stringlist v1.0.1
-	github.com/multiformats/go-multibase v0.1.1
+	github.com/multiformats/go-multibase v0.2.0
 	github.com/multiformats/go-multihash v0.2.1
 	github.com/prometheus/client_golang v1.14.0
 	github.com/stanvit/go-forwarded v0.0.0-20150905014133-9ab0287086b3
