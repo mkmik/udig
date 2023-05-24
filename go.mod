@@ -13,7 +13,7 @@ require (
 	github.com/ipfs/go-cid v0.4.1
 	github.com/mkmik/stringlist v1.1.0
 	github.com/multiformats/go-multibase v0.2.0
-	github.com/multiformats/go-multihash v0.2.1
+	github.com/multiformats/go-multihash v0.2.2
 	github.com/prometheus/client_golang v1.14.0
 	github.com/stanvit/go-forwarded v0.0.0-20150905014133-9ab0287086b3
 	golang.org/x/crypto v0.7.0
