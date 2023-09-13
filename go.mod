@@ -21,7 +21,7 @@ require (
 	golang.org/x/net v0.14.0
 	google.golang.org/genproto v0.0.0-20230911183012-2d3300fd4832
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230822172742-b8732ec3820d
-	google.golang.org/grpc v1.57.0
+	google.golang.org/grpc v1.58.0
 	google.golang.org/protobuf v1.31.0
 )
 
