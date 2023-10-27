@@ -1,6 +1,6 @@
 # syntax = docker/dockerfile:1-experimental
 
-ARG GO_VERSION=1.18
+ARG GO_VERSION=1.21
 
 FROM golang:${GO_VERSION}-bullseye AS builder
 
