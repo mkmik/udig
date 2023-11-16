@@ -16,7 +16,7 @@ require (
 	github.com/multiformats/go-multihash v0.2.3
 	github.com/prometheus/client_golang v1.14.0
 	github.com/stanvit/go-forwarded v0.0.0-20150905014133-9ab0287086b3
-	golang.org/x/crypto v0.14.0
+	golang.org/x/crypto v0.15.0
 	golang.org/x/net v0.17.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20231106174013-bbf56f31fb17
 	google.golang.org/grpc v1.58.3
@@ -39,8 +39,8 @@ require (
 	github.com/prometheus/procfs v0.8.0 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/stretchr/testify v1.8.4 // indirect
-	golang.org/x/sys v0.13.0 // indirect
-	golang.org/x/text v0.13.0 // indirect
+	golang.org/x/sys v0.14.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/grpc/examples v0.0.0-20201124195647-53c8623768ef // indirect
 	lukechampine.com/blake3 v1.1.6 // indirect
 )
