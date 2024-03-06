@@ -6,7 +6,7 @@ require (
 	github.com/bitnami-labs/promhttpmux v0.1.0
 	github.com/cockroachdb/cmux v0.0.0-20170110192607-30d10be49292
 	github.com/golang/glog v1.1.2
-	github.com/golang/protobuf v1.5.3
+	github.com/golang/protobuf v1.5.4
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.1
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
@@ -21,7 +21,7 @@ require (
 	golang.org/x/net v0.17.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240304212257-790db918fca8
 	google.golang.org/grpc v1.58.3
-	google.golang.org/protobuf v1.32.0
+	google.golang.org/protobuf v1.33.0
 )
 
 require (
