@@ -8,7 +8,7 @@ require (
 	github.com/golang/glog v1.2.2
 	github.com/golang/protobuf v1.5.4
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
-	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.1
+	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.1.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/hashicorp/yamux v0.1.1
 	github.com/ipfs/go-cid v0.4.1
@@ -20,7 +20,7 @@ require (
 	golang.org/x/crypto v0.21.0
 	golang.org/x/net v0.23.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240808171019-573a1156607a
-	google.golang.org/grpc v1.58.3
+	google.golang.org/grpc v1.61.1
 	google.golang.org/protobuf v1.34.2
 )
 
