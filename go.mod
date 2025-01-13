@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/bitnami-labs/promhttpmux v0.1.0
 	github.com/cockroachdb/cmux v0.0.0-20170110192607-30d10be49292
-	github.com/golang/glog v1.2.3
+	github.com/golang/glog v1.2.4
 	github.com/golang/protobuf v1.5.4
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.1
