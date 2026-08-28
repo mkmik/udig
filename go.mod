@@ -1,6 +1,6 @@
 module github.com/mkmik/udig
 
-go 1.21
+go 1.25
 
 require (
 	github.com/bitnami-labs/promhttpmux v0.1.0
@@ -13,7 +13,7 @@ require (
 	github.com/hashicorp/yamux v0.1.2
 	github.com/ipfs/go-cid v0.4.1
 	github.com/mkmik/stringlist v1.1.0
-	github.com/multiformats/go-multibase v0.2.0
+	github.com/multiformats/go-multibase v0.3.0
 	github.com/multiformats/go-multihash v0.2.3
 	github.com/prometheus/client_golang v1.14.0
 	github.com/stanvit/go-forwarded v0.0.0-20150905014133-9ab0287086b3
@@ -31,9 +31,9 @@ require (
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/minio/sha256-simd v1.0.0 // indirect
-	github.com/mr-tron/base58 v1.2.0 // indirect
-	github.com/multiformats/go-base32 v0.0.3 // indirect
-	github.com/multiformats/go-base36 v0.1.0 // indirect
+	github.com/mr-tron/base58 v1.3.0 // indirect
+	github.com/multiformats/go-base32 v0.1.0 // indirect
+	github.com/multiformats/go-base36 v0.2.0 // indirect
 	github.com/multiformats/go-varint v0.0.6 // indirect
 	github.com/prometheus/client_model v0.3.0 // indirect
 	github.com/prometheus/common v0.37.0 // indirect
