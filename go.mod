@@ -1,6 +1,6 @@
 module github.com/mkmik/udig
 
-go 1.25.0
+go 1.26.0
 
 require (
 	github.com/bitnami-labs/promhttpmux v0.1.0
@@ -18,9 +18,9 @@ require (
 	github.com/stanvit/go-forwarded v0.0.0-20150905014133-9ab0287086b3
 	golang.org/x/crypto v0.55.0
 	golang.org/x/net v0.58.0
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260526163538-3dc84a4a5aaa
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20261012220534-4341edf3f941
 	google.golang.org/grpc v1.83.2
-	google.golang.org/protobuf v1.36.11
+	google.golang.org/protobuf v1.36.12
 )
 
 require (
